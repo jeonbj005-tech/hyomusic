@@ -340,8 +340,20 @@ public class MainFragment extends BaseFragment {
                 .take(10)
                 .toList()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::appendGeminiResults, throwable -> Toast.makeText(requireContext(),
-                        R.string.simple_tunes_gemini_error, Toast.LENGTH_LONG).show()));
+                .subscribe(this::appendGeminiResults, this::showGeminiError));
+    }
+
+    private void showGeminiError(final Throwable throwable) {
+        String detail = throwable.getMessage();
+        if (detail == null || detail.trim().isEmpty()) {
+            detail = throwable.getClass().getSimpleName();
+        }
+        detail = detail.replace('\n', ' ');
+        if (detail.length() > 180) {
+            detail = detail.substring(0, 180) + "…";
+        }
+        Toast.makeText(requireContext(), getString(R.string.simple_tunes_gemini_error_detail,
+                detail), Toast.LENGTH_LONG).show();
     }
 
     private List<String> requestGeminiQueries(final String apiKey, final String prompt)
@@ -354,36 +366,54 @@ public class MainFragment extends BaseFragment {
                                         + "request: "
                                         + prompt)))))
                 .put("generationConfig", new JSONObject().put("temperature", 0.6));
-        final Request request = new Request.Builder()
-                .url("https://generativelanguage.googleapis.com/v1beta/models/"
-                        + "gemini-3.8-flash:generateContent")
-                .header("x-goog-api-key", apiKey)
-                .post(RequestBody.create(requestJson.toString(), MediaType.get(
-                        "application/json; charset=utf-8")))
-                .build();
-        try (Response response = DownloaderImpl.getInstance().getClient()
-                .newCall(request).execute()) {
-            if (!response.isSuccessful() || response.body() == null) {
-                throw new IllegalStateException("Gemini request failed: " + response.code());
-            }
-            final JSONObject root = new JSONObject(response.body().string());
-            final String text = root.getJSONArray("candidates").getJSONObject(0)
-                    .getJSONObject("content").getJSONArray("parts").getJSONObject(0)
-                    .getString("text").replace("```json", "").replace("```", "").trim();
-            final int start = text.indexOf('[');
-            final int end = text.lastIndexOf(']');
-            if (start < 0 || end <= start) {
-                throw new IllegalStateException("Gemini returned no query list");
-            }
-            final JSONArray queriesJson = new JSONArray(text.substring(start, end + 1));
-            final List<String> queries = new ArrayList<>();
-            for (int i = 0; i < queriesJson.length() && queries.size() < 10; i++) {
-                final String query = queriesJson.optString(i).trim();
-                if (!query.isEmpty()) {
-                    queries.add(query);
+        String lastError = "Gemini request failed";
+        for (final String model : new String[]{"gemini-3.8-flash", "gemini-2.5-flash"}) {
+            final Request request = new Request.Builder()
+                    .url("https://generativelanguage.googleapis.com/v1beta/models/"
+                            + model + ":generateContent")
+                    .header("x-goog-api-key", apiKey)
+                    .post(RequestBody.create(requestJson.toString(), MediaType.get(
+                            "application/json; charset=utf-8")))
+                    .build();
+            try (Response response = DownloaderImpl.getInstance().getClient()
+                    .newCall(request).execute()) {
+                final String body = response.body() == null ? "" : response.body().string();
+                if (!response.isSuccessful()) {
+                    lastError = "HTTP " + response.code() + ": " + geminiErrorDetail(body);
+                    if (response.code() == 400 || response.code() == 404) {
+                        continue;
+                    }
+                    throw new IllegalStateException(lastError);
                 }
+                final JSONObject root = new JSONObject(body);
+                final String text = root.getJSONArray("candidates").getJSONObject(0)
+                        .getJSONObject("content").getJSONArray("parts").getJSONObject(0)
+                        .getString("text").replace("```json", "").replace("```", "").trim();
+                final int start = text.indexOf('[');
+                final int end = text.lastIndexOf(']');
+                if (start < 0 || end <= start) {
+                    throw new IllegalStateException("Gemini returned no query list");
+                }
+                final JSONArray queriesJson = new JSONArray(text.substring(start, end + 1));
+                final List<String> queries = new ArrayList<>();
+                for (int i = 0; i < queriesJson.length() && queries.size() < 10; i++) {
+                    final String query = queriesJson.optString(i).trim();
+                    if (!query.isEmpty()) {
+                        queries.add(query);
+                    }
+                }
+                return queries;
             }
-            return queries;
+        }
+        throw new IllegalStateException(lastError);
+    }
+
+    private String geminiErrorDetail(final String body) {
+        try {
+            final JSONObject error = new JSONObject(body).optJSONObject("error");
+            return error == null ? body : error.optString("message", body);
+        } catch (final Exception ignored) {
+            return body.isEmpty() ? "unknown error" : body;
         }
     }
 
