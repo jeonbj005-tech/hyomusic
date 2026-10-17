@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +73,44 @@ public class MainFragment extends BaseFragment {
         binding.hyoClassical.setOnClickListener(view -> playGenre("classical music"));
         binding.hyoOldies.setOnClickListener(view -> playGenre("oldies music"));
         binding.themeButton.setOnClickListener(view -> showThemePicker());
+        colorizeGenreIcons();
+        loadRecentSummary();
+    }
+
+    private void colorizeGenreIcons() {
+        colorize(binding.hyoPop, 0xFF9CC7FF);
+        colorize(binding.hyoRock, 0xFFD4A7FF);
+        colorize(binding.hyoBallad, 0xFFFFA9C8);
+        colorize(binding.hyoJazz, 0xFF8FE2D5);
+        colorize(binding.hyoClassical, 0xFFFFD28C);
+        colorize(binding.hyoOldies, 0xFFB7D2FF);
+    }
+
+    private void colorize(final android.widget.TextView view, final int color) {
+        final String label = view.getText().toString();
+        final SpannableString styled = new SpannableString(label);
+        styled.setSpan(new ForegroundColorSpan(color), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        view.setText(styled);
+    }
+
+    private void loadRecentSummary() {
+        final HistoryRecordManager historyManager = new HistoryRecordManager(requireContext());
+        disposables.add(historyManager.getStreamHistory()
+                .firstOrError()
+                .map(history -> history.stream()
+                        .filter(item -> item.getStreamEntity().getServiceId()
+                                == ServiceList.YouTube.getServiceId())
+                        .findFirst()
+                        .map(StreamHistoryEntry::toStreamInfoItem))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(item -> {
+                    if (item.isPresent()) {
+                        binding.simpleRecentTitle.setText(item.get().getName());
+                        final String artist = item.get().getUploaderName();
+                        binding.simpleRecentArtist.setText(artist == null || artist.isEmpty()
+                                ? getString(R.string.simple_tunes_recent_subtitle) : artist);
+                    }
+                }, throwable -> { }));
     }
 
     private void showThemePicker() {

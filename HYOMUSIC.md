@@ -71,6 +71,7 @@ APK 출력 위치는 `app/build/outputs/apk/debug/app-debug.apk`입니다.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.7.apk`, versionCode 1021 (상단 앱바/상태바 테마 동기화)
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.8.apk`, versionCode 1022. 중복 홈 제목 박스 삭제, 다크 앱바, 둥근 카드와 장르별 색상 테두리 적용. assembleDebug 및 Checkstyle 성공. 에뮬레이터 설치는 ADB 연결 종료로 실패하여 화면 실행 검증은 미완료.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.9.apk`, versionCode 1023. 색상 테마를 팝업 선택으로 이동하고 최근 음악 카드에 스펙트럼 이미지를 추가. assembleDebug 및 156개 단위 테스트 성공.
+- 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.10.apk`, versionCode 1024. 장르 카드 확대, 파스텔 아이콘, 최근 곡 제목/가수 표시, 오디오 FFT 기반 스펙트럼과 기기 제한 시 대체 애니메이션 추가. assembleDebug 및 단위 테스트 성공.
 - 홈 화면에 현재 재생 카드, 상단 검색/설정, 저장형 4색 테마 선택 추가
 - 홈 UI: 네이비 배경, 그라데이션 헤더, 둥근 장르 카드
 - 장르 검색은 YouTube 일반 음악 검색 결과에서 스트림 최대 10개를 큐에 추가
