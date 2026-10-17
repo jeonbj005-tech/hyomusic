@@ -63,7 +63,10 @@ APK 출력 위치는 `app/build/outputs/apk/debug/app-debug.apk`입니다.
 - 변경 후: `lintDebug` 태스크 완료. 변경하지 않은 upstream 코드의 기존 Error 진단 2건
   (`AboutActivity` lint 해석 실패, `KeyboardUtil` 플래그)과 Warning 347건은 보고서에 남아 있음
 - APK 확인: `kr.co.hyomusic.debug`, 표시 이름 `효도뮤직`, debug v1/v2 서명 검증 성공
-- 최종 APK SHA-256: `6D777DC704EBE979C106C92AE1DD213032A031F2918CF6068FEB8F99F1A6F7F9`
+- 현재 APK: `HyoMusic-debug-v0.29.1-hyo.2.apk`, versionCode 1016
+- 홈 화면 MaterialComponents 테마 오류 수정: AppCompatButton 사용을 APK XML에서 확인
+- 현재 APK SHA-256: `1CA75411DC80EC86DC8C10C6D82433EDA24CED3CF7A56CAB5FF48094C606DB02`
+- hyo.2: `assembleDebug` 성공. 에뮬레이터 설치는 `connect error for write: closed`로 실패
 - 실제 Android 기기/차량: 에뮬레이터가 offline 상태라 설치 및 실기기 시나리오 미실행
 
 실기기에서는 화면 꺼짐, 앱 백그라운드, 전화 수신/종료, 차량 Bluetooth 연결/해제,
