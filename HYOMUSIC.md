@@ -67,7 +67,7 @@ APK 출력 위치는 `app/build/outputs/apk/debug/app-debug.apk`입니다.
 - 최신 홈: `SimpleTunes`, 장르별 YouTube 음악 최대 10곡 큐(Pop/Rock/Ballad/Jazz/Classical/Oldies)
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.3.apk`, versionCode 1017
 - 최종 APK: `SimpleTunes-debug-v0.29.1-hyo.4.apk`, versionCode 1018
-- 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.5.apk`, versionCode 1019
+- 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.6.apk`, versionCode 1020 (한 화면 컴팩트 홈 UI)
 - 홈 화면에 현재 재생 카드, 상단 검색/설정, 저장형 4색 테마 선택 추가
 - 홈 UI: 네이비 배경, 그라데이션 헤더, 둥근 장르 카드
 - 장르 검색은 YouTube 일반 음악 검색 결과에서 스트림 최대 10개를 큐에 추가
