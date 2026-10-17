@@ -64,6 +64,8 @@ APK 출력 위치는 `app/build/outputs/apk/debug/app-debug.apk`입니다.
   (`AboutActivity` lint 해석 실패, `KeyboardUtil` 플래그)과 Warning 347건은 보고서에 남아 있음
 - APK 확인: `kr.co.hyomusic.debug`, 표시 이름 `효도뮤직`, debug v1/v2 서명 검증 성공
 - 현재 APK: `HyoMusic-debug-v0.29.1-hyo.2.apk`, versionCode 1016
+- 최신 홈: `SimpleTunes`, 장르별 YouTube 음악 최대 10곡 큐(Pop/Rock/Ballad/Jazz/Classical/Oldies)
+- 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.3.apk`, versionCode 1017
 - 홈 화면 MaterialComponents 테마 오류 수정: AppCompatButton 사용을 APK XML에서 확인
 - 현재 APK SHA-256: `1CA75411DC80EC86DC8C10C6D82433EDA24CED3CF7A56CAB5FF48094C606DB02`
 - hyo.2: `assembleDebug` 성공. 에뮬레이터 설치는 `connect error for write: closed`로 실패

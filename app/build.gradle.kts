@@ -31,7 +31,7 @@ configure<ApplicationExtension> {
 
     defaultConfig {
         applicationId = "kr.co.hyomusic"
-        resValue("string", "app_name", "효도뮤직")
+        resValue("string", "app_name", "SimpleTunes")
         minSdk {
             version = release(NEWPIPE_VERSION_SDK_MIN)
         }
@@ -39,7 +39,7 @@ configure<ApplicationExtension> {
             version = release(NEWPIPE_VERSION_SDK_TARGET)
         }
 
-        versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: 1016
+        versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: 1017
 
         versionName = NEWPIPE_VERSION_NAME
         System.getProperty("versionNameSuffix")?.let { versionNameSuffix = it }
@@ -50,7 +50,7 @@ configure<ApplicationExtension> {
     buildTypes {
         debug {
             isDebuggable = true
-            versionNameSuffix = "-hyo.2"
+            versionNameSuffix = "-hyo.3"
 
             applicationIdSuffix = ".debug"
         }

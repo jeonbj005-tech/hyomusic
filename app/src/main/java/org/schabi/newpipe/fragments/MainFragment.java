@@ -19,15 +19,19 @@ import org.schabi.newpipe.R;
 import org.schabi.newpipe.database.history.model.StreamHistoryEntry;
 import org.schabi.newpipe.databinding.FragmentMainBinding;
 import org.schabi.newpipe.extractor.ServiceList;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
+import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.NavigationHelper;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainFragment extends BaseFragment {
     private FragmentMainBinding binding;
@@ -52,6 +56,35 @@ public class MainFragment extends BaseFragment {
                 NavigationHelper.openBookmarksFragment(getFM()));
         binding.hyoPlayAll.setOnClickListener(view -> playHistory(false));
         binding.hyoResume.setOnClickListener(view -> playHistory(true));
+        binding.hyoPop.setOnClickListener(view -> playGenre("pop music"));
+        binding.hyoRock.setOnClickListener(view -> playGenre("rock music"));
+        binding.hyoBallad.setOnClickListener(view -> playGenre("ballad music"));
+        binding.hyoJazz.setOnClickListener(view -> playGenre("jazz music"));
+        binding.hyoClassical.setOnClickListener(view -> playGenre("classical music"));
+        binding.hyoOldies.setOnClickListener(view -> playGenre("oldies music"));
+    }
+
+    private void playGenre(final String genre) {
+        Toast.makeText(requireContext(), R.string.simple_tunes_loading, Toast.LENGTH_SHORT).show();
+        disposables.add(ExtractorHelper.searchFor(ServiceList.YouTube.getServiceId(), genre,
+                        Arrays.asList("music_songs"), "")
+                .subscribeOn(Schedulers.io())
+                .map(result -> result.getRelatedItems().stream()
+                        .filter(item -> item instanceof StreamInfoItem)
+                        .map(item -> (StreamInfoItem) item)
+                        .limit(10)
+                        .collect(Collectors.toList()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(items -> {
+                    if (items.isEmpty()) {
+                        Toast.makeText(requireContext(), R.string.simple_tunes_no_genre,
+                                Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    NavigationHelper.playOnBackgroundPlayer(requireContext(),
+                            new SinglePlayQueue(items, 0), true);
+                }, throwable -> Toast.makeText(requireContext(), R.string.simple_tunes_genre_error,
+                        Toast.LENGTH_LONG).show()));
     }
 
     private void playHistory(final boolean latestOnly) {
