@@ -12,8 +12,6 @@
     <string name="simple_tunes_theme_button">Choose color theme</string>
     <string name="simple_tunes_recent_title">Recent music</string>
     <string name="simple_tunes_recent_subtitle">Tap to listen again</string>
-    <string name="simple_tunes_lyrics_loading">Loading lyrics…</string>
-    <string name="simple_tunes_lyrics_unavailable">Lyrics are not available for this video.</string>
     <string name="simple_tunes_loading">Loading 10 songs…</string>
     <string name="simple_tunes_no_genre">No songs found for this genre.</string>
     <string name="simple_tunes_genre_error">Could not load this genre.</string>
