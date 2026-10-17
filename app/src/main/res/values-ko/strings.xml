@@ -9,6 +9,10 @@
     <string name="hyo_resume_short">이어듣기</string>
     <string name="simple_tunes_genres">장르별 추천</string>
     <string name="simple_tunes_theme_title">색상 테마</string>
+    <string name="simple_tunes_theme_button">색상 테마 선택</string>
+    <string name="simple_tunes_recent_title">최근 들은 음악</string>
+    <string name="simple_tunes_recent_subtitle">눌러서 다시 듣기</string>
+    <string name="simple_tunes_spectrum_description">음악 스펙트럼</string>
     <string name="simple_tunes_loading">노래 10곡을 불러오는 중…</string>
     <string name="simple_tunes_no_genre">이 장르의 노래를 찾지 못했습니다.</string>
     <string name="simple_tunes_genre_error">장르 노래를 불러오지 못했습니다.</string>

@@ -6,6 +6,7 @@
 package org.schabi.newpipe.fragments;
 
 import android.os.Bundle;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
@@ -68,10 +69,22 @@ public class MainFragment extends BaseFragment {
         binding.hyoJazz.setOnClickListener(view -> playGenre("jazz music"));
         binding.hyoClassical.setOnClickListener(view -> playGenre("classical music"));
         binding.hyoOldies.setOnClickListener(view -> playGenre("oldies music"));
-        binding.themeBlue.setOnClickListener(view -> applyTheme(0));
-        binding.themePurple.setOnClickListener(view -> applyTheme(1));
-        binding.themeGreen.setOnClickListener(view -> applyTheme(2));
-        binding.themeOrange.setOnClickListener(view -> applyTheme(3));
+        binding.themeButton.setOnClickListener(view -> showThemePicker());
+    }
+
+    private void showThemePicker() {
+        final String[] themes = {"Blue", "Purple", "Green", "Orange"};
+        final int selected = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getInt("simple_tunes_theme", 0);
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.simple_tunes_theme_title)
+                .setSingleChoiceItems(themes, selected, (dialog, which) -> {
+                    applyTheme(which);
+                    dialog.dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel, (DialogInterface dialog, int which) ->
+                        dialog.dismiss())
+                .show();
     }
 
     private void applyTheme(final int theme) {
