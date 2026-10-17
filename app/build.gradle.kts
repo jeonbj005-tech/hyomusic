@@ -39,7 +39,7 @@ configure<ApplicationExtension> {
             version = release(NEWPIPE_VERSION_SDK_TARGET)
         }
 
-        versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: 1031
+        versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: 1032
 
         versionName = NEWPIPE_VERSION_NAME
         System.getProperty("versionNameSuffix")?.let { versionNameSuffix = it }
@@ -50,7 +50,7 @@ configure<ApplicationExtension> {
     buildTypes {
         debug {
             isDebuggable = true
-            versionNameSuffix = "-hyo.17"
+            versionNameSuffix = "-hyo.18"
 
             applicationIdSuffix = ".debug"
         }

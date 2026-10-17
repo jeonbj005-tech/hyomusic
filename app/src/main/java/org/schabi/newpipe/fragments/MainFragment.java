@@ -272,9 +272,10 @@ public class MainFragment extends BaseFragment {
     }
 
     private void showGeminiPrompt() {
-        final String savedKey = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .getString("simple_tunes_gemini_api_key", "");
-        if (savedKey == null || savedKey.trim().isEmpty()) {
+        final String savedKey = normalizeGeminiApiKey(PreferenceManager
+                .getDefaultSharedPreferences(requireContext())
+                .getString("simple_tunes_gemini_api_key", ""));
+        if (!isGeminiApiKeyValid(savedKey)) {
             showGeminiApiKeyDialog();
             return;
         }
@@ -306,11 +307,15 @@ public class MainFragment extends BaseFragment {
                 .setView(input)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    final String key = input.getText().toString().trim();
+                    final String key = normalizeGeminiApiKey(input.getText().toString());
                     if (key.isEmpty()) {
                         Toast.makeText(requireContext(),
                                 R.string.simple_tunes_gemini_api_key_required,
                                 Toast.LENGTH_SHORT).show();
+                    } else if (!isGeminiApiKeyValid(key)) {
+                        Toast.makeText(requireContext(),
+                                R.string.simple_tunes_gemini_api_key_invalid,
+                                Toast.LENGTH_LONG).show();
                     } else {
                         PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
                                 .putString("simple_tunes_gemini_api_key", key).apply();
@@ -320,7 +325,20 @@ public class MainFragment extends BaseFragment {
                 .show();
     }
 
+    private String normalizeGeminiApiKey(final String key) {
+        return key == null ? "" : key.trim().replaceAll("[\\s\"'`]", "");
+    }
+
+    private boolean isGeminiApiKeyValid(final String key) {
+        return key.matches("AIza[0-9A-Za-z_-]{20,}");
+    }
+
     private void generateGeminiPlaylist(final String apiKey, final String prompt) {
+        if (!isGeminiApiKeyValid(apiKey)) {
+            Toast.makeText(requireContext(), R.string.simple_tunes_gemini_api_key_invalid,
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
         Toast.makeText(requireContext(), R.string.simple_tunes_gemini_loading,
                 Toast.LENGTH_SHORT).show();
         disposables.add(Observable.fromCallable(() -> requestGeminiQueries(apiKey, prompt))
