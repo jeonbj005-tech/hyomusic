@@ -736,13 +736,14 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
             return;
         }
 
-        final boolean showPrev = playQueue.getIndex() != 0;
-        final boolean showNext = playQueue.getIndex() + 1 != playQueue.getStreams().size();
+        // Keep transport controls available in the collapsed mini player too. Previous restarts
+        // the current item at the beginning, while next wraps for complete queues.
+        final boolean showTransport = !playQueue.getStreams().isEmpty();
 
-        binding.playPreviousButton.setVisibility(showPrev ? View.VISIBLE : View.INVISIBLE);
-        binding.playPreviousButton.setAlpha(showPrev ? 1.0f : 0.0f);
-        binding.playNextButton.setVisibility(showNext ? View.VISIBLE : View.INVISIBLE);
-        binding.playNextButton.setAlpha(showNext ? 1.0f : 0.0f);
+        binding.playPreviousButton.setVisibility(showTransport ? View.VISIBLE : View.INVISIBLE);
+        binding.playPreviousButton.setAlpha(showTransport ? 1.0f : 0.0f);
+        binding.playNextButton.setVisibility(showTransport ? View.VISIBLE : View.INVISIBLE);
+        binding.playNextButton.setAlpha(showTransport ? 1.0f : 0.0f);
     }
 
     protected void showSystemUIPartially() {

@@ -201,7 +201,7 @@ public class MainFragment extends BaseFragment {
                 .put("generationConfig", new JSONObject().put("temperature", 0.6));
         final Request request = new Request.Builder()
                 .url("https://generativelanguage.googleapis.com/v1beta/models/"
-                        + "gemini-2.0-flash:generateContent")
+                        + "gemini-3.8-flash:generateContent")
                 .header("x-goog-api-key", apiKey)
                 .post(RequestBody.create(requestJson.toString(), MediaType.get(
                         "application/json; charset=utf-8")))
