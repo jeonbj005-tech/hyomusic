@@ -33,61 +33,57 @@
             android:text="@string/hyo_home_subtitle"
             android:textSize="20sp" />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/hyo_search"
-            style="@style/Widget.MaterialComponents.Button.Icon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="16dp"
+            android:gravity="center_vertical"
             android:minHeight="80dp"
+            android:paddingStart="24dp"
             android:text="@string/hyo_search"
-            android:textSize="24sp"
-            app:icon="@drawable/ic_search"
-            app:iconGravity="textStart"
-            app:iconPadding="16dp"
-            app:iconSize="32dp" />
+            android:textSize="24sp" />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/hyo_favorites"
-            style="@style/Widget.MaterialComponents.Button.Icon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:drawableStart="@drawable/ic_bookmark"
+            android:drawablePadding="16dp"
+            android:gravity="center_vertical"
             android:minHeight="80dp"
+            android:paddingStart="24dp"
             android:text="@string/hyo_favorites"
-            android:textSize="24sp"
-            app:icon="@drawable/ic_bookmark"
-            app:iconGravity="textStart"
-            app:iconPadding="16dp"
-            app:iconSize="32dp" />
+            android:textSize="24sp" />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/hyo_play_all"
-            style="@style/Widget.MaterialComponents.Button.Icon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:drawableStart="@drawable/ic_play_arrow"
+            android:drawablePadding="16dp"
+            android:gravity="center_vertical"
             android:minHeight="80dp"
+            android:paddingStart="24dp"
             android:text="@string/hyo_play_all"
-            android:textSize="24sp"
-            app:icon="@drawable/ic_play_arrow"
-            app:iconGravity="textStart"
-            app:iconPadding="16dp"
-            app:iconSize="32dp" />
+            android:textSize="24sp" />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/hyo_resume"
-            style="@style/Widget.MaterialComponents.Button.Icon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
+            android:drawableStart="@drawable/ic_history"
+            android:drawablePadding="16dp"
+            android:gravity="center_vertical"
             android:minHeight="80dp"
+            android:paddingStart="24dp"
             android:text="@string/hyo_resume"
-            android:textSize="24sp"
-            app:icon="@drawable/ic_history"
-            app:iconGravity="textStart"
-            app:iconPadding="16dp"
-            app:iconSize="32dp" />
+            android:textSize="24sp" />
 
         <org.schabi.newpipe.views.NewPipeTextView
             android:layout_width="match_parent"
