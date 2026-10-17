@@ -66,6 +66,9 @@ APK 출력 위치는 `app/build/outputs/apk/debug/app-debug.apk`입니다.
 - 현재 APK: `HyoMusic-debug-v0.29.1-hyo.2.apk`, versionCode 1016
 - 최신 홈: `SimpleTunes`, 장르별 YouTube 음악 최대 10곡 큐(Pop/Rock/Ballad/Jazz/Classical/Oldies)
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.3.apk`, versionCode 1017
+- 최종 APK: `SimpleTunes-debug-v0.29.1-hyo.4.apk`, versionCode 1018
+- 홈 UI: 네이비 배경, 그라데이션 헤더, 둥근 장르 카드
+- 장르 검색은 YouTube 일반 음악 검색 결과에서 스트림 최대 10개를 큐에 추가
 - 홈 화면 MaterialComponents 테마 오류 수정: AppCompatButton 사용을 APK XML에서 확인
 - 현재 APK SHA-256: `1CA75411DC80EC86DC8C10C6D82433EDA24CED3CF7A56CAB5FF48094C606DB02`
 - hyo.2: `assembleDebug` 성공. 에뮬레이터 설치는 `connect error for write: closed`로 실패

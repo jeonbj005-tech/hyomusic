@@ -25,7 +25,7 @@ import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
 import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.NavigationHelper;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,8 +66,8 @@ public class MainFragment extends BaseFragment {
 
     private void playGenre(final String genre) {
         Toast.makeText(requireContext(), R.string.simple_tunes_loading, Toast.LENGTH_SHORT).show();
-        disposables.add(ExtractorHelper.searchFor(ServiceList.YouTube.getServiceId(), genre,
-                        Arrays.asList("music_songs"), "")
+        disposables.add(ExtractorHelper.searchFor(ServiceList.YouTube.getServiceId(),
+                        genre + " official audio", Collections.emptyList(), "")
                 .subscribeOn(Schedulers.io())
                 .map(result -> result.getRelatedItems().stream()
                         .filter(item -> item instanceof StreamInfoItem)

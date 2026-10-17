@@ -3,16 +3,25 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/simple_tunes_background"
     android:fillViewport="true">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:background="@drawable/simple_tunes_header"
+            android:orientation="vertical"
+            android:padding="22dp">
         <org.schabi.newpipe.views.NewPipeTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/hyo_home_title"
+            android:textColor="#FFFFFF"
             android:textSize="34sp"
             android:textStyle="bold" />
         <org.schabi.newpipe.views.NewPipeTextView
@@ -21,16 +30,21 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="18dp"
             android:text="@string/hyo_home_subtitle"
+            android:textColor="#E8F7FF"
             android:textSize="18sp" />
+        </LinearLayout>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/hyo_search"
             android:layout_width="match_parent"
             android:layout_height="64dp"
+            android:background="@drawable/simple_tunes_header"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="14dp"
             android:gravity="center_vertical"
             android:paddingStart="20dp"
             android:text="@string/hyo_search"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
             android:textSize="21sp" />
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,7 +56,10 @@
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
+                android:background="@drawable/simple_tunes_action"
                 android:text="@string/hyo_favorites"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
                 android:textSize="17sp" />
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/hyo_resume"
@@ -50,7 +67,10 @@
                 android:layout_height="60dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
+                android:background="@drawable/simple_tunes_action"
                 android:text="@string/hyo_resume_short"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
                 android:textSize="17sp" />
         </LinearLayout>
         <androidx.appcompat.widget.AppCompatButton
@@ -58,7 +78,10 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="8dp"
+            android:background="@drawable/simple_tunes_action"
             android:text="@string/hyo_play_all"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
             android:textSize="17sp" />
         <org.schabi.newpipe.views.NewPipeTextView
             android:layout_width="match_parent"
@@ -66,25 +89,27 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="8dp"
             android:text="@string/simple_tunes_genres"
+            android:textColor="#F7F8FF"
             android:textSize="24sp"
             android:textStyle="bold" />
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_pop" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginEnd="6dp" android:layout_weight="1" android:text="Pop\n10 songs" android:textSize="18sp" />
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_rock" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginStart="6dp" android:layout_weight="1" android:text="Rock\n10 songs" android:textSize="18sp" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_pop" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginEnd="6dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:text="Pop\n10 songs" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="18sp" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_rock" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginStart="6dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:text="Rock\n10 songs" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="18sp" />
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_ballad" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginEnd="6dp" android:layout_weight="1" android:text="Ballad\n10 songs" android:textSize="18sp" />
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_jazz" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginStart="6dp" android:layout_weight="1" android:text="Jazz\n10 songs" android:textSize="18sp" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_ballad" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginEnd="6dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:text="Ballad\n10 songs" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="18sp" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_jazz" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginStart="6dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:text="Jazz\n10 songs" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="18sp" />
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_classical" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginEnd="6dp" android:layout_weight="1" android:text="Classical\n10 songs" android:textSize="18sp" />
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_oldies" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginStart="6dp" android:layout_weight="1" android:text="Oldies\n10 songs" android:textSize="18sp" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_classical" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginEnd="6dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:text="Classical\n10 songs" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="18sp" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_oldies" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginStart="6dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:text="Oldies\n10 songs" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="18sp" />
         </LinearLayout>
         <org.schabi.newpipe.views.NewPipeTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/hyo_policy_notice"
+            android:textColor="#A8B0C7"
             android:textSize="13sp" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
