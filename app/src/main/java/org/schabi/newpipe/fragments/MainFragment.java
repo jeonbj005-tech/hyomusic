@@ -23,18 +23,15 @@ import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.BaseFragment;
 import org.schabi.newpipe.R;
-import org.schabi.newpipe.database.history.model.StreamHistoryEntry;
 import org.schabi.newpipe.databinding.FragmentMainBinding;
 import org.schabi.newpipe.extractor.ServiceList;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
-import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
 import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.NavigationHelper;
 
 import java.util.Collections;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -61,10 +58,8 @@ public class MainFragment extends BaseFragment {
 
         binding.hyoSearch.setOnClickListener(view -> NavigationHelper.openSearchFragment(
                 getFM(), ServiceList.YouTube.getServiceId(), ""));
-        binding.hyoFavorites.setOnClickListener(view ->
+        binding.hyoPlaylist.setOnClickListener(view ->
                 NavigationHelper.openBookmarksFragment(getFM()));
-        binding.hyoPlayAll.setOnClickListener(view -> playHistory(false));
-        binding.hyoResume.setOnClickListener(view -> playHistory(true));
         binding.hyoPop.setOnClickListener(view -> playGenre("pop music"));
         binding.hyoRock.setOnClickListener(view -> playGenre("rock music"));
         binding.hyoBallad.setOnClickListener(view -> playGenre("ballad music"));
@@ -147,9 +142,6 @@ public class MainFragment extends BaseFragment {
         }
         requireActivity().getWindow().setStatusBarColor(background);
         requireActivity().getWindow().setNavigationBarColor(background);
-        styleCard(binding.hyoFavorites, card, first);
-        styleCard(binding.hyoResume, card, second);
-        styleCard(binding.hyoPlayAll, card, second);
         styleCard(binding.hyoPop, card, Color.rgb(106, 164, 255));
         styleCard(binding.hyoRock, card, Color.rgb(178, 124, 245));
         styleCard(binding.hyoBallad, card, Color.rgb(242, 132, 173));
@@ -194,33 +186,6 @@ public class MainFragment extends BaseFragment {
                     NavigationHelper.playOnBackgroundPlayer(requireContext(),
                             new SinglePlayQueue(items, 0), true);
                 }, throwable -> Toast.makeText(requireContext(), R.string.simple_tunes_genre_error,
-                        Toast.LENGTH_LONG).show()));
-    }
-
-    private void playHistory(final boolean latestOnly) {
-        final var historyManager = new HistoryRecordManager(requireContext());
-        disposables.add(historyManager.getStreamHistory()
-                .firstOrError()
-                .map(history -> {
-                    Stream<StreamHistoryEntry> youtubeHistory = history.stream()
-                            .filter(item -> item.getStreamEntity().getServiceId()
-                                    == ServiceList.YouTube.getServiceId());
-                    if (latestOnly) {
-                        youtubeHistory = youtubeHistory.limit(1);
-                    }
-                    return youtubeHistory.map(StreamHistoryEntry::toStreamInfoItem)
-                            .collect(Collectors.toList());
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(items -> {
-                    if (items.isEmpty()) {
-                        Toast.makeText(requireContext(), R.string.hyo_no_history,
-                                Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    NavigationHelper.playOnBackgroundPlayer(requireContext(),
-                            new SinglePlayQueue(items, 0), true);
-                }, throwable -> Toast.makeText(requireContext(), R.string.hyo_history_error,
                         Toast.LENGTH_LONG).show()));
     }
 
