@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/simple_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/simple_tunes_background"
@@ -17,6 +18,17 @@
             android:background="@drawable/simple_tunes_header"
             android:orientation="vertical"
             android:padding="22dp">
+        <LinearLayout
+            android:id="@+id/simple_hero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="18dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
         <org.schabi.newpipe.views.NewPipeTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,6 +36,22 @@
             android:textColor="#FFFFFF"
             android:textSize="34sp"
             android:textStyle="bold" />
+        <Space android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/simple_top_search"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/hyo_search"
+            android:src="@drawable/ic_search" />
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/simple_top_settings"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/settings"
+            android:src="@drawable/ic_settings" />
+        </LinearLayout>
         <org.schabi.newpipe.views.NewPipeTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,6 +60,7 @@
             android:text="@string/hyo_home_subtitle"
             android:textColor="#E8F7FF"
             android:textSize="18sp" />
+        </LinearLayout>
         </LinearLayout>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/hyo_search"
@@ -46,6 +75,18 @@
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="21sp" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/hyo_now_playing"
+            android:layout_width="match_parent"
+            android:layout_height="126dp"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/simple_tunes_action"
+            android:gravity="center_vertical"
+            android:padding="20dp"
+            android:text="Now playing\nTap to resume your last song"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -103,6 +144,23 @@
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
             <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_classical" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginEnd="6dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:text="Classical\n10 songs" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="18sp" />
             <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_oldies" android:layout_width="0dp" android:layout_height="72dp" android:layout_marginStart="6dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:text="Oldies\n10 songs" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="18sp" />
+        </LinearLayout>
+        <org.schabi.newpipe.views.NewPipeTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/simple_tunes_theme_title"
+            android:textColor="#F7F8FF"
+            android:textSize="18sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/theme_blue" android:layout_width="0dp" android:layout_height="48dp" android:layout_marginEnd="5dp" android:layout_weight="1" android:backgroundTint="#4B8DFF" android:text="Blue" android:textAllCaps="false" android:textColor="#FFFFFF" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/theme_purple" android:layout_width="0dp" android:layout_height="48dp" android:layout_marginEnd="5dp" android:layout_weight="1" android:backgroundTint="#9A52FF" android:text="Purple" android:textAllCaps="false" android:textColor="#FFFFFF" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/theme_green" android:layout_width="0dp" android:layout_height="48dp" android:layout_marginEnd="5dp" android:layout_weight="1" android:backgroundTint="#20B992" android:text="Green" android:textAllCaps="false" android:textColor="#FFFFFF" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/theme_orange" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:backgroundTint="#FF8747" android:text="Orange" android:textAllCaps="false" android:textColor="#FFFFFF" />
         </LinearLayout>
         <org.schabi.newpipe.views.NewPipeTextView
             android:layout_width="match_parent"

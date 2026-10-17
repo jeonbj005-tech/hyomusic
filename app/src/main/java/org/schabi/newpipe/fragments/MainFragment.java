@@ -6,6 +6,8 @@
 package org.schabi.newpipe.fragments;
 
 import android.os.Bundle;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.BaseFragment;
 import org.schabi.newpipe.R;
@@ -49,6 +52,8 @@ public class MainFragment extends BaseFragment {
         super.initViews(rootView, savedInstanceState);
         binding = FragmentMainBinding.bind(rootView);
         setTitle(getString(R.string.app_name));
+        applyTheme(PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getInt("simple_tunes_theme", 0));
 
         binding.hyoSearch.setOnClickListener(view -> NavigationHelper.openSearchFragment(
                 getFM(), ServiceList.YouTube.getServiceId(), ""));
@@ -56,12 +61,70 @@ public class MainFragment extends BaseFragment {
                 NavigationHelper.openBookmarksFragment(getFM()));
         binding.hyoPlayAll.setOnClickListener(view -> playHistory(false));
         binding.hyoResume.setOnClickListener(view -> playHistory(true));
+        binding.simpleTopSearch.setOnClickListener(view -> binding.hyoSearch.performClick());
+        binding.simpleTopSettings.setOnClickListener(view ->
+                NavigationHelper.openSettings(requireContext()));
+        binding.hyoNowPlaying.setOnClickListener(view -> playHistory(true));
         binding.hyoPop.setOnClickListener(view -> playGenre("pop music"));
         binding.hyoRock.setOnClickListener(view -> playGenre("rock music"));
         binding.hyoBallad.setOnClickListener(view -> playGenre("ballad music"));
         binding.hyoJazz.setOnClickListener(view -> playGenre("jazz music"));
         binding.hyoClassical.setOnClickListener(view -> playGenre("classical music"));
         binding.hyoOldies.setOnClickListener(view -> playGenre("oldies music"));
+        binding.themeBlue.setOnClickListener(view -> applyTheme(0));
+        binding.themePurple.setOnClickListener(view -> applyTheme(1));
+        binding.themeGreen.setOnClickListener(view -> applyTheme(2));
+        binding.themeOrange.setOnClickListener(view -> applyTheme(3));
+    }
+
+    private void applyTheme(final int theme) {
+        final int background;
+        final int card;
+        final int first;
+        final int second;
+        switch (theme) {
+            case 1 -> {
+                background = Color.rgb(16, 13, 32);
+                card = Color.rgb(42, 31, 74);
+                first = Color.rgb(150, 82, 255);
+                second = Color.rgb(61, 118, 255);
+            }
+            case 2 -> {
+                background = Color.rgb(8, 25, 25);
+                card = Color.rgb(24, 61, 60);
+                first = Color.rgb(24, 181, 148);
+                second = Color.rgb(81, 209, 125);
+            }
+            case 3 -> {
+                background = Color.rgb(31, 17, 12);
+                card = Color.rgb(75, 43, 29);
+                first = Color.rgb(255, 126, 66);
+                second = Color.rgb(255, 190, 78);
+            }
+            default -> {
+                background = Color.rgb(13, 16, 32);
+                card = Color.rgb(32, 38, 64);
+                first = Color.rgb(109, 69, 245);
+                second = Color.rgb(24, 183, 216);
+            }
+        }
+        binding.simpleRoot.setBackgroundColor(background);
+        binding.simpleHero.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                new int[]{first, second}));
+        binding.hyoSearch.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                new int[]{first, second}));
+        binding.hyoNowPlaying.setBackgroundColor(card);
+        binding.hyoFavorites.setBackgroundColor(card);
+        binding.hyoResume.setBackgroundColor(card);
+        binding.hyoPlayAll.setBackgroundColor(card);
+        binding.hyoPop.setBackgroundColor(card);
+        binding.hyoRock.setBackgroundColor(card);
+        binding.hyoBallad.setBackgroundColor(card);
+        binding.hyoJazz.setBackgroundColor(card);
+        binding.hyoClassical.setBackgroundColor(card);
+        binding.hyoOldies.setBackgroundColor(card);
+        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
+                .putInt("simple_tunes_theme", theme).apply();
     }
 
     private void playGenre(final String genre) {
