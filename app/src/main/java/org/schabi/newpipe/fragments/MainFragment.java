@@ -61,9 +61,6 @@ public class MainFragment extends BaseFragment {
                 NavigationHelper.openBookmarksFragment(getFM()));
         binding.hyoPlayAll.setOnClickListener(view -> playHistory(false));
         binding.hyoResume.setOnClickListener(view -> playHistory(true));
-        binding.simpleTopSearch.setOnClickListener(view -> binding.hyoSearch.performClick());
-        binding.simpleTopSettings.setOnClickListener(view ->
-                NavigationHelper.openSettings(requireContext()));
         binding.hyoNowPlaying.setOnClickListener(view -> playHistory(true));
         binding.hyoPop.setOnClickListener(view -> playGenre("pop music"));
         binding.hyoRock.setOnClickListener(view -> playGenre("rock music"));
@@ -109,32 +106,41 @@ public class MainFragment extends BaseFragment {
             }
         }
         binding.simpleRoot.setBackgroundColor(background);
-        final GradientDrawable gradient = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                new int[]{first, second});
-        binding.simpleHero.setBackground(gradient);
-        binding.hyoSearch.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                new int[]{first, second}));
+        styleCard(binding.hyoSearch, card, second);
         // The activity toolbar and status bar are outside fragment_main.xml. Keep them
         // in the same palette so the home screen does not start with an unrelated red bar.
         final View toolbar = requireActivity().findViewById(R.id.toolbar);
         if (toolbar != null) {
-            toolbar.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                    new int[]{first, second}));
+            toolbar.setBackgroundColor(background);
         }
         requireActivity().getWindow().setStatusBarColor(background);
         requireActivity().getWindow().setNavigationBarColor(background);
-        binding.hyoNowPlaying.setBackgroundColor(card);
-        binding.hyoFavorites.setBackgroundColor(card);
-        binding.hyoResume.setBackgroundColor(card);
-        binding.hyoPlayAll.setBackgroundColor(card);
-        binding.hyoPop.setBackgroundColor(card);
-        binding.hyoRock.setBackgroundColor(card);
-        binding.hyoBallad.setBackgroundColor(card);
-        binding.hyoJazz.setBackgroundColor(card);
-        binding.hyoClassical.setBackgroundColor(card);
-        binding.hyoOldies.setBackgroundColor(card);
+        styleCard(binding.hyoNowPlaying, card, first);
+        styleCard(binding.hyoFavorites, card, first);
+        styleCard(binding.hyoResume, card, second);
+        styleCard(binding.hyoPlayAll, card, second);
+        styleCard(binding.hyoPop, card, Color.rgb(106, 164, 255));
+        styleCard(binding.hyoRock, card, Color.rgb(178, 124, 245));
+        styleCard(binding.hyoBallad, card, Color.rgb(242, 132, 173));
+        styleCard(binding.hyoJazz, card, Color.rgb(74, 196, 178));
+        styleCard(binding.hyoClassical, card, Color.rgb(245, 187, 104));
+        styleCard(binding.hyoOldies, card, Color.rgb(133, 174, 230));
         PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
                 .putInt("simple_tunes_theme", theme).apply();
+    }
+
+    private void styleCard(final View view, final int color, final int accent) {
+        final float density = getResources().getDisplayMetrics().density;
+        final GradientDrawable shape = new GradientDrawable();
+        shape.setColor(color);
+        shape.setCornerRadius(20 * density);
+        shape.setStroke((int) Math.ceil(density), Color.argb(65,
+                Color.red(accent), Color.green(accent), Color.blue(accent)));
+        androidx.core.view.ViewCompat.setBackgroundTintList(view, null);
+        view.setBackground(new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(Color.argb(45,
+                        Color.red(accent), Color.green(accent), Color.blue(accent))),
+                shape, null));
     }
 
     private void playGenre(final String genre) {
