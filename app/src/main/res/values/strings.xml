@@ -10,6 +10,14 @@
     <string name="simple_tunes_genres">Pick a genre</string>
     <string name="simple_tunes_theme_title">Color theme</string>
     <string name="simple_tunes_theme_button">Choose color theme</string>
+    <string name="simple_tunes_gemini_playlist">Create playlist with Gemini AI</string>
+    <string name="simple_tunes_gemini_prompt_hint">e.g. 10 Korean ballads from the 1990s</string>
+    <string name="simple_tunes_gemini_api_key_title">Gemini API key</string>
+    <string name="simple_tunes_gemini_api_key_hint">Enter your AIza… key</string>
+    <string name="simple_tunes_gemini_api_key_required">Enter a Gemini API key first.</string>
+    <string name="simple_tunes_gemini_loading">Gemini is creating a playlist…</string>
+    <string name="simple_tunes_gemini_empty">No recommended songs were found.</string>
+    <string name="simple_tunes_gemini_error">Could not create a Gemini playlist.</string>
     <string name="simple_tunes_recent_title">Recent music</string>
     <string name="simple_tunes_recent_subtitle">Tap to listen again</string>
     <string name="simple_tunes_loading">Loading 10 songs…</string>
