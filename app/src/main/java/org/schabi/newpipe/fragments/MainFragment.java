@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.text.HtmlCompat;
 import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.BaseFragment;
@@ -109,8 +110,50 @@ public class MainFragment extends BaseFragment {
                         final String artist = item.get().getUploaderName();
                         binding.simpleRecentArtist.setText(artist == null || artist.isEmpty()
                                 ? getString(R.string.simple_tunes_recent_subtitle) : artist);
+                        loadLyrics(item.get().getUrl());
                     }
                 }, throwable -> { }));
+    }
+
+    private void loadLyrics(final String url) {
+        disposables.add(ExtractorHelper.getStreamInfo(ServiceList.YouTube.getServiceId(),
+                        url, false)
+                .subscribeOn(Schedulers.io())
+                .map(info -> info.getDescription() == null
+                        ? "" : info.getDescription().getContent())
+                .map(this::lyricSnippet)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(lyrics -> binding.simpleRecentLyrics.setText(lyrics),
+                        throwable -> binding.simpleRecentLyrics
+                                .setText(R.string.simple_tunes_lyrics_unavailable)));
+    }
+
+    private String lyricSnippet(final String description) {
+        if (description == null || description.trim().isEmpty()) {
+            return getString(R.string.simple_tunes_lyrics_unavailable);
+        }
+        final String plain = HtmlCompat.fromHtml(description, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                .toString().replace('\r', ' ').trim();
+        if (plain.isEmpty()) {
+            return getString(R.string.simple_tunes_lyrics_unavailable);
+        }
+        final String[] lines = plain.split("\\n+");
+        final StringBuilder snippet = new StringBuilder();
+        for (final String line : lines) {
+            final String clean = line.trim();
+            if (clean.isEmpty() || clean.startsWith("http")) {
+                continue;
+            }
+            if (snippet.length() > 0) {
+                snippet.append('\n');
+            }
+            snippet.append(clean);
+            if (snippet.length() >= 120 || snippet.toString().split("\\n").length == 3) {
+                break;
+            }
+        }
+        return snippet.length() == 0
+                ? getString(R.string.simple_tunes_lyrics_unavailable) : snippet.toString();
     }
 
     private void showThemePicker() {
