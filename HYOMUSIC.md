@@ -73,6 +73,7 @@ APK 출력 위치는 `app/build/outputs/apk/debug/app-debug.apk`입니다.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.9.apk`, versionCode 1023. 색상 테마를 팝업 선택으로 이동하고 최근 음악 카드에 스펙트럼 이미지를 추가. assembleDebug 및 156개 단위 테스트 성공.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.10.apk`, versionCode 1024. 장르 카드 확대, 파스텔 아이콘, 최근 곡 제목/가수 표시, 오디오 FFT 기반 스펙트럼과 기기 제한 시 대체 애니메이션 추가. assembleDebug 및 단위 테스트 성공.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.11.apk`, versionCode 1025. 최근 음악 카드의 스펙트럼을 제거하고 YouTube 설명 기반 가사 미리보기로 교체. 제목·가수 표시 유지. assembleDebug 및 단위 테스트 성공.
+- 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.12.apk`, versionCode 1026. 최근 음악 중복 카드를 제거하고 하단 미니 플레이어를 단일 곡 정보 영역으로 사용. 홈 콘텐츠 세로 스크롤과 명확한 `테마` 버튼 적용. assembleDebug 및 단위 테스트 성공.
 - 홈 화면에 현재 재생 카드, 상단 검색/설정, 저장형 4색 테마 선택 추가
 - 홈 UI: 네이비 배경, 그라데이션 헤더, 둥근 장르 카드
 - 장르 검색은 YouTube 일반 음악 검색 결과에서 스트림 최대 10개를 큐에 추가

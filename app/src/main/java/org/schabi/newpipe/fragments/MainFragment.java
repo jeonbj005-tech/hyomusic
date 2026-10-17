@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.text.HtmlCompat;
 import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.BaseFragment;
@@ -66,7 +65,6 @@ public class MainFragment extends BaseFragment {
                 NavigationHelper.openBookmarksFragment(getFM()));
         binding.hyoPlayAll.setOnClickListener(view -> playHistory(false));
         binding.hyoResume.setOnClickListener(view -> playHistory(true));
-        binding.hyoNowPlaying.setOnClickListener(view -> playHistory(true));
         binding.hyoPop.setOnClickListener(view -> playGenre("pop music"));
         binding.hyoRock.setOnClickListener(view -> playGenre("rock music"));
         binding.hyoBallad.setOnClickListener(view -> playGenre("ballad music"));
@@ -75,7 +73,6 @@ public class MainFragment extends BaseFragment {
         binding.hyoOldies.setOnClickListener(view -> playGenre("oldies music"));
         binding.themeButton.setOnClickListener(view -> showThemePicker());
         colorizeGenreIcons();
-        loadRecentSummary();
     }
 
     private void colorizeGenreIcons() {
@@ -92,68 +89,6 @@ public class MainFragment extends BaseFragment {
         final SpannableString styled = new SpannableString(label);
         styled.setSpan(new ForegroundColorSpan(color), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         view.setText(styled);
-    }
-
-    private void loadRecentSummary() {
-        final HistoryRecordManager historyManager = new HistoryRecordManager(requireContext());
-        disposables.add(historyManager.getStreamHistory()
-                .firstOrError()
-                .map(history -> history.stream()
-                        .filter(item -> item.getStreamEntity().getServiceId()
-                                == ServiceList.YouTube.getServiceId())
-                        .findFirst()
-                        .map(StreamHistoryEntry::toStreamInfoItem))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(item -> {
-                    if (item.isPresent()) {
-                        binding.simpleRecentTitle.setText(item.get().getName());
-                        final String artist = item.get().getUploaderName();
-                        binding.simpleRecentArtist.setText(artist == null || artist.isEmpty()
-                                ? getString(R.string.simple_tunes_recent_subtitle) : artist);
-                        loadLyrics(item.get().getUrl());
-                    }
-                }, throwable -> { }));
-    }
-
-    private void loadLyrics(final String url) {
-        disposables.add(ExtractorHelper.getStreamInfo(ServiceList.YouTube.getServiceId(),
-                        url, false)
-                .subscribeOn(Schedulers.io())
-                .map(info -> info.getDescription() == null
-                        ? "" : info.getDescription().getContent())
-                .map(this::lyricSnippet)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(lyrics -> binding.simpleRecentLyrics.setText(lyrics),
-                        throwable -> binding.simpleRecentLyrics
-                                .setText(R.string.simple_tunes_lyrics_unavailable)));
-    }
-
-    private String lyricSnippet(final String description) {
-        if (description == null || description.trim().isEmpty()) {
-            return getString(R.string.simple_tunes_lyrics_unavailable);
-        }
-        final String plain = HtmlCompat.fromHtml(description, HtmlCompat.FROM_HTML_MODE_LEGACY)
-                .toString().replace('\r', ' ').trim();
-        if (plain.isEmpty()) {
-            return getString(R.string.simple_tunes_lyrics_unavailable);
-        }
-        final String[] lines = plain.split("\\n+");
-        final StringBuilder snippet = new StringBuilder();
-        for (final String line : lines) {
-            final String clean = line.trim();
-            if (clean.isEmpty() || clean.startsWith("http")) {
-                continue;
-            }
-            if (snippet.length() > 0) {
-                snippet.append('\n');
-            }
-            snippet.append(clean);
-            if (snippet.length() >= 120 || snippet.toString().split("\\n").length == 3) {
-                break;
-            }
-        }
-        return snippet.length() == 0
-                ? getString(R.string.simple_tunes_lyrics_unavailable) : snippet.toString();
     }
 
     private void showThemePicker() {
@@ -212,7 +147,6 @@ public class MainFragment extends BaseFragment {
         }
         requireActivity().getWindow().setStatusBarColor(background);
         requireActivity().getWindow().setNavigationBarColor(background);
-        styleCard(binding.hyoNowPlaying, card, first);
         styleCard(binding.hyoFavorites, card, first);
         styleCard(binding.hyoResume, card, second);
         styleCard(binding.hyoPlayAll, card, second);
