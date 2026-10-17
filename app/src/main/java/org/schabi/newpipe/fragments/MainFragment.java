@@ -109,10 +109,20 @@ public class MainFragment extends BaseFragment {
             }
         }
         binding.simpleRoot.setBackgroundColor(background);
-        binding.simpleHero.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                new int[]{first, second}));
+        final GradientDrawable gradient = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                new int[]{first, second});
+        binding.simpleHero.setBackground(gradient);
         binding.hyoSearch.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 new int[]{first, second}));
+        // The activity toolbar and status bar are outside fragment_main.xml. Keep them
+        // in the same palette so the home screen does not start with an unrelated red bar.
+        final View toolbar = requireActivity().findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                    new int[]{first, second}));
+        }
+        requireActivity().getWindow().setStatusBarColor(background);
+        requireActivity().getWindow().setNavigationBarColor(background);
         binding.hyoNowPlaying.setBackgroundColor(card);
         binding.hyoFavorites.setBackgroundColor(card);
         binding.hyoResume.setBackgroundColor(card);
