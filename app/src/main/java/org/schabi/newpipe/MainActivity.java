@@ -67,6 +67,7 @@ import org.schabi.newpipe.databinding.InstanceSpinnerLayoutBinding;
 import org.schabi.newpipe.databinding.ToolbarLayoutBinding;
 import org.schabi.newpipe.error.ErrorUtil;
 import org.schabi.newpipe.extractor.NewPipe;
+import org.schabi.newpipe.extractor.ServiceList;
 import org.schabi.newpipe.extractor.StreamingService;
 import org.schabi.newpipe.extractor.comments.CommentsInfoItem;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
@@ -85,7 +86,6 @@ import org.schabi.newpipe.settings.UpdateSettingsFragment;
 import org.schabi.newpipe.settings.migration.MigrationManager;
 import org.schabi.newpipe.util.Constants;
 import org.schabi.newpipe.util.DeviceUtils;
-import org.schabi.newpipe.util.KioskTranslator;
 import org.schabi.newpipe.util.Localization;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.PeertubeHelper;
@@ -146,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Localization.migrateAppLanguageSettingIfNecessary(getApplicationContext());
+        ServiceHelper.setSelectedServiceId(this, ServiceList.YouTube.getServiceId());
         ThemeHelper.setDayNightMode(this);
         ThemeHelper.setTheme(this, ServiceHelper.getSelectedServiceId(this));
 
@@ -165,6 +166,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPrefEditor = sharedPreferences.edit();
+        sharedPrefEditor
+                .putBoolean(getString(R.string.enable_watch_history_key), true)
+                .putBoolean(getString(R.string.enable_playback_resume_key), true)
+                .apply();
 
         mainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         drawerLayoutBinding = mainBinding.drawerLayout;
@@ -274,46 +279,15 @@ public class MainActivity extends AppCompatActivity {
      * @throws ExtractionException if the service didn't provide available kiosks
      */
     private void addDrawerMenuForCurrentService() throws ExtractionException {
-        //Tabs
-        drawerLayoutBinding.navigation.getMenu()
-                .add(R.id.menu_tabs_group, ITEM_ID_SUBSCRIPTIONS, ORDER,
-                        R.string.tab_subscriptions)
-                .setIcon(R.drawable.ic_tv);
-        drawerLayoutBinding.navigation.getMenu()
-                .add(R.id.menu_tabs_group, ITEM_ID_FEED, ORDER, R.string.fragment_feed_title)
-                .setIcon(R.drawable.ic_subscriptions);
+        // HyoMusic intentionally exposes only playlists, settings and license/about information.
         drawerLayoutBinding.navigation.getMenu()
                 .add(R.id.menu_tabs_group, ITEM_ID_BOOKMARKS, ORDER, R.string.tab_bookmarks)
                 .setIcon(R.drawable.ic_bookmark);
-        drawerLayoutBinding.navigation.getMenu()
-                .add(R.id.menu_tabs_group, ITEM_ID_DOWNLOADS, ORDER, R.string.downloads)
-                .setIcon(R.drawable.ic_file_download);
-        drawerLayoutBinding.navigation.getMenu()
-                .add(R.id.menu_tabs_group, ITEM_ID_HISTORY, ORDER, R.string.action_history)
-                .setIcon(R.drawable.ic_history);
-
-        //Kiosks
-        final int currentServiceId = ServiceHelper.getSelectedServiceId(this);
-        final StreamingService service = NewPipe.getService(currentServiceId);
-
-        int kioskMenuItemId = 0;
-
-        for (final String ks : service.getKioskList().getAvailableKiosks()) {
-            drawerLayoutBinding.navigation.getMenu()
-                    .add(R.id.menu_kiosks_group, kioskMenuItemId, 0, KioskTranslator
-                            .getTranslatedKioskName(ks, this))
-                    .setIcon(KioskTranslator.getKioskIcon(ks));
-            kioskMenuItemId++;
-        }
 
         //Settings and About
         drawerLayoutBinding.navigation.getMenu()
                 .add(R.id.menu_options_about_group, ITEM_ID_SETTINGS, ORDER, R.string.settings)
                 .setIcon(R.drawable.ic_settings);
-        drawerLayoutBinding.navigation.getMenu()
-                .add(R.id.menu_options_about_group, ITEM_ID_DONATION, ORDER,
-                        R.string.donation_title)
-                .setIcon(R.drawable.volunteer_activism_ic);
         drawerLayoutBinding.navigation.getMenu()
                 .add(R.id.menu_options_about_group, ITEM_ID_ABOUT, ORDER, R.string.tab_about)
                 .setIcon(R.drawable.ic_info_outline);
@@ -399,7 +373,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupDrawerHeader() {
-        drawerHeaderBinding.drawerHeaderActionButton.setOnClickListener(view -> toggleServices());
+        drawerHeaderBinding.drawerHeaderActionButton.setEnabled(false);
+        drawerHeaderBinding.drawerArrow.setVisibility(View.GONE);
 
         // If the current app name is bigger than the default "NewPipe" (7 chars),
         // let the text view grow a little more as well.
@@ -554,10 +529,6 @@ public class MainActivity extends AppCompatActivity {
             NavigationHelper.openMainActivity(this);
         }
 
-        final boolean isHistoryEnabled = sharedPreferences.getBoolean(
-                getString(R.string.enable_watch_history_key), true);
-        drawerLayoutBinding.navigation.getMenu().findItem(ITEM_ID_HISTORY)
-                .setVisible(isHistoryEnabled);
     }
 
     @Override

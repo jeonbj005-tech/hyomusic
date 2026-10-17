@@ -50,7 +50,6 @@ import org.schabi.newpipe.databinding.PlaylistControlBinding;
 import org.schabi.newpipe.error.ErrorInfo;
 import org.schabi.newpipe.error.UserAction;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
-import org.schabi.newpipe.fragments.MainFragment;
 import org.schabi.newpipe.fragments.list.playlist.PlaylistControlViewHolder;
 import org.schabi.newpipe.info_list.dialog.InfoItemDialog;
 import org.schabi.newpipe.info_list.dialog.StreamDialogDefaultEntry;
@@ -107,13 +106,6 @@ public class LocalPlaylistFragment extends BaseLocalListFragment<List<PlaylistSt
     private DebounceSaver debounceSaver;
     /** Flag to prevent simultaneous rewrites of the playlist. */
     private boolean isRewritingPlaylist = false;
-
-    /**
-     * The pager adapter that the fragment is created from when it is used as frontpage, i.e.
-     * {@link #useAsFrontPage} is {@link true}.
-     */
-    @Nullable
-    private MainFragment.SelectedTabsPagerAdapter tabsPagerAdapter = null;
 
     public static LocalPlaylistFragment getInstance(final long playlistId, final String name) {
         final var instance = new LocalPlaylistFragment();
@@ -307,9 +299,6 @@ public class LocalPlaylistFragment extends BaseLocalListFragment<List<PlaylistSt
         }
         if (disposables != null) {
             disposables.dispose();
-        }
-        if (tabsPagerAdapter != null) {
-            tabsPagerAdapter.getLocalPlaylistFragments().remove(this);
         }
 
         debounceSaver = null;
@@ -917,9 +906,5 @@ public class LocalPlaylistFragment extends BaseLocalListFragment<List<PlaylistSt
                 .show();
     }
 
-    public void setTabsPagerAdapter(
-            @Nullable final MainFragment.SelectedTabsPagerAdapter tabsPagerAdapter) {
-        this.tabsPagerAdapter = tabsPagerAdapter;
-    }
 }
 

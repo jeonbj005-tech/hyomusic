@@ -235,7 +235,9 @@ public class RouterActivity extends AppCompatActivity {
                         }
 
                         // return whether the url was found to be supported or not
-                        return currentLinkType != LinkType.NONE;
+                        return currentService.getServiceId()
+                                == org.schabi.newpipe.extractor.ServiceList.YouTube.getServiceId()
+                                && currentLinkType != LinkType.NONE;
                     } catch (final ExtractionException e) {
                         // this can be reached only when the url is completely unsupported
                         return false;
@@ -530,10 +532,6 @@ public class RouterActivity extends AppCompatActivity {
         final var capabilities = service.getServiceInfo().getMediaCapabilities();
 
         if (linkType == LinkType.STREAM || linkType == LinkType.PLAYLIST) {
-            if (capabilities.contains(VIDEO)) {
-                returnedItems.add(videoPlayer);
-                returnedItems.add(popupPlayer);
-            }
             if (capabilities.contains(AUDIO)) {
                 returnedItems.add(backgroundPlayer);
             }
@@ -547,12 +545,6 @@ public class RouterActivity extends AppCompatActivity {
             }
 
             if (linkType == LinkType.STREAM) {
-                // download is redundant for linkType CHANNEL AND PLAYLIST
-                // (till playlist downloading is not supported )
-                returnedItems.add(new AdapterChoiceItem(getString(R.string.download_key),
-                        getString(R.string.download),
-                        R.drawable.ic_file_download));
-
                 // Add to playlist is not necessary for CHANNEL and PLAYLIST linkType
                 // since those can not be added to a playlist
                 returnedItems.add(new AdapterChoiceItem(getString(R.string.add_to_playlist_key),

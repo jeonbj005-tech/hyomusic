@@ -1,6 +1,5 @@
 package org.schabi.newpipe;
 
-import static org.schabi.newpipe.util.SparseItemUtil.fetchStreamInfoAndSaveToDatabase;
 import static org.schabi.newpipe.util.external_communication.ShareUtils.shareText;
 
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.widget.PopupMenu;
 import androidx.fragment.app.FragmentManager;
 
 import org.schabi.newpipe.database.stream.model.StreamEntity;
-import org.schabi.newpipe.download.DownloadDialog;
 import org.schabi.newpipe.local.dialog.PlaylistDialog;
 import org.schabi.newpipe.player.playqueue.PlayQueue;
 import org.schabi.newpipe.player.playqueue.PlayQueueItem;
@@ -76,14 +74,6 @@ public final class QueueItemMenuUtil {
             } else if (itemId == R.id.menu_item_share) {
                 shareText(context, item.getTitle(), item.getUrl(),
                         item.getThumbnails());
-                return true;
-            } else if (itemId == R.id.menu_item_download) {
-                fetchStreamInfoAndSaveToDatabase(context, item.getServiceId(), item.getUrl(),
-                        info -> {
-                            final DownloadDialog downloadDialog = new DownloadDialog(context,
-                                    info);
-                            downloadDialog.show(fragmentManager, "downloadDialog");
-                        });
                 return true;
             }
             return false;

@@ -53,11 +53,11 @@ import org.schabi.newpipe.extractor.ListExtractor;
 import org.schabi.newpipe.extractor.MetaInfo;
 import org.schabi.newpipe.extractor.NewPipe;
 import org.schabi.newpipe.extractor.Page;
+import org.schabi.newpipe.extractor.ServiceList;
 import org.schabi.newpipe.extractor.StreamingService;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.search.SearchExtractor;
 import org.schabi.newpipe.extractor.search.SearchInfo;
-import org.schabi.newpipe.extractor.services.peertube.linkHandler.PeertubeSearchQueryHandlerFactory;
 import org.schabi.newpipe.extractor.services.youtube.linkHandler.YoutubeSearchQueryHandlerFactory;
 import org.schabi.newpipe.fragments.BackPressable;
 import org.schabi.newpipe.fragments.list.BaseListFragment;
@@ -452,18 +452,8 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
         }
 
         for (final String filter : service.getSearchQHFactory().getAvailableContentFilter()) {
-            if (filter.equals(YoutubeSearchQueryHandlerFactory.MUSIC_SONGS)) {
-                final MenuItem musicItem = menu.add(2,
-                        itemId++,
-                        0,
-                        "YouTube Music");
-                musicItem.setEnabled(false);
-            } else if (filter.equals(PeertubeSearchQueryHandlerFactory.SEPIA_VIDEOS)) {
-                final MenuItem sepiaItem = menu.add(2,
-                        itemId++,
-                        0,
-                        "Sepia Search");
-                sepiaItem.setEnabled(false);
+            if (!isHyoMusicSearchFilter(filter)) {
+                continue;
             }
             menuItemToFilterName.put(itemId, filter);
             final MenuItem item = menu.add(1,
@@ -478,6 +468,14 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
         menu.setGroupCheckable(1, true, true);
 
         restoreFilterChecked(menu, filterItemCheckedId);
+    }
+
+    static boolean isHyoMusicSearchFilter(final String filter) {
+        return filter.equals("all")
+                || filter.equals(YoutubeSearchQueryHandlerFactory.MUSIC_SONGS)
+                || filter.equals("channels")
+                || filter.equals("playlists")
+                || filter.equals("music_playlists");
     }
 
     @Override
@@ -840,6 +838,10 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
         // and open it if possible.
         try {
             final StreamingService streamingService = NewPipe.getServiceByUrl(theSearchString);
+            if (streamingService.getServiceId() != ServiceList.YouTube.getServiceId()) {
+                showTextError(getString(R.string.unsupported_url));
+                return;
+            }
             showLoading();
             disposables.add(Observable
                     .fromCallable(() -> NavigationHelper.getIntentByLink(activity,

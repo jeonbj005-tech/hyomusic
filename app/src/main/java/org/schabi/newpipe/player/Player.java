@@ -54,6 +54,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.media.AudioDeviceCallback;
+import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
@@ -244,6 +246,8 @@ public final class Player implements PlaybackListener, Listener {
 
     private BroadcastReceiver broadcastReceiver;
     private IntentFilter intentFilter;
+    private AudioDeviceCallback audioDeviceCallback;
+    private boolean resumeOnBluetoothReconnect;
     @Nullable
     private PlayerServiceEventListener fragmentListener = null;
     @Nullable
@@ -290,6 +294,7 @@ public final class Player implements PlaybackListener, Listener {
         recordManager = new HistoryRecordManager(context);
 
         setupBroadcastReceiver();
+        setupAudioDeviceCallback();
 
         trackSelector = new DefaultTrackSelector(context, PlayerHelper.getQualitySelector());
         final PlayerDataSource dataSource = new PlayerDataSource(context,
@@ -693,6 +698,7 @@ public final class Player implements PlaybackListener, Listener {
 
         destroyPlayer();
         unregisterBroadcastReceiver();
+        unregisterAudioDeviceCallback();
 
         databaseUpdateDisposable.clear();
         progressUpdateDisposable.set(null);
@@ -810,6 +816,7 @@ public final class Player implements PlaybackListener, Listener {
 
         switch (intent.getAction()) {
             case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
+                resumeOnBluetoothReconnect = audioPlayerSelected() && getPlayWhenReady();
                 pause();
                 break;
             case ACTION_CLOSE:
@@ -866,6 +873,37 @@ public final class Player implements PlaybackListener, Listener {
             Log.w(TAG, "Broadcast receiver already unregistered: "
                     + unregisteredException.getMessage());
         }
+    }
+
+    private void setupAudioDeviceCallback() {
+        audioDeviceCallback = new AudioDeviceCallback() {
+            @Override
+            public void onAudioDevicesAdded(final AudioDeviceInfo[] addedDevices) {
+                if (!resumeOnBluetoothReconnect) {
+                    return;
+                }
+                for (final AudioDeviceInfo device : addedDevices) {
+                    if (device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP) {
+                        resumeOnBluetoothReconnect = false;
+                        play();
+                        return;
+                    }
+                }
+            }
+        };
+        final AudioManager audioManager =
+                (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.registerAudioDeviceCallback(audioDeviceCallback, null);
+    }
+
+    private void unregisterAudioDeviceCallback() {
+        if (audioDeviceCallback == null) {
+            return;
+        }
+        final AudioManager audioManager =
+                (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.unregisterAudioDeviceCallback(audioDeviceCallback);
+        audioDeviceCallback = null;
     }
     //endregion
 

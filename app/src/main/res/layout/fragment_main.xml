@@ -1,26 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+  SPDX-FileCopyrightText: 2026 HyoMusic contributors
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-
-    <org.schabi.newpipe.views.ScrollableTabLayout
-        android:id="@+id/main_tab_layout"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="?attr/colorPrimary"
-        app:tabRippleColor="@color/white"
-        app:tabIconTint="@color/white"
-        app:tabIndicatorColor="@color/white"
-        app:tabGravity="fill"
-        app:tabMinWidth="60dp" />
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/main_tab_layout" />
+        <org.schabi.newpipe.views.NewPipeTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="@string/hyo_home_title"
+            android:textSize="32sp"
+            android:textStyle="bold" />
 
-</RelativeLayout>
+        <org.schabi.newpipe.views.NewPipeTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="28dp"
+            android:gravity="center"
+            android:text="@string/hyo_home_subtitle"
+            android:textSize="20sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/hyo_search"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:minHeight="80dp"
+            android:text="@string/hyo_search"
+            android:textSize="24sp"
+            app:icon="@drawable/ic_search"
+            app:iconGravity="textStart"
+            app:iconPadding="16dp"
+            app:iconSize="32dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/hyo_favorites"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:minHeight="80dp"
+            android:text="@string/hyo_favorites"
+            android:textSize="24sp"
+            app:icon="@drawable/ic_bookmark"
+            app:iconGravity="textStart"
+            app:iconPadding="16dp"
+            app:iconSize="32dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/hyo_play_all"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:minHeight="80dp"
+            android:text="@string/hyo_play_all"
+            android:textSize="24sp"
+            app:icon="@drawable/ic_play_arrow"
+            app:iconGravity="textStart"
+            app:iconPadding="16dp"
+            app:iconSize="32dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/hyo_resume"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:minHeight="80dp"
+            android:text="@string/hyo_resume"
+            android:textSize="24sp"
+            app:icon="@drawable/ic_history"
+            app:iconGravity="textStart"
+            app:iconPadding="16dp"
+            app:iconSize="32dp" />
+
+        <org.schabi.newpipe.views.NewPipeTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/hyo_policy_notice"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

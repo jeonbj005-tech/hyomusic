@@ -17,15 +17,6 @@ plugins {
     checkstyle
 }
 
-val gitWorkingBranch = providers.exec {
-    commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
-}.standardOutput.asText.map { it.trim() }
-val defaultBranches = listOf("master", "dev")
-val workingBranch = gitWorkingBranch.getOrElse("")
-val normalizedWorkingBranch = workingBranch
-    .replaceFirst("^[^A-Za-z]+".toRegex(), "")
-    .replace("[^0-9A-Za-z]+".toRegex(), "")
-
 kotlin {
     jvmToolchain(21)
 }
@@ -39,8 +30,8 @@ configure<ApplicationExtension> {
     namespace = NEWPIPE_APPLICATION_ID_OLD
 
     defaultConfig {
-        applicationId = NEWPIPE_APPLICATION_ID_OLD
-        resValue("string", "app_name", "NewPipe")
+        applicationId = "kr.co.hyomusic"
+        resValue("string", "app_name", "효도뮤직")
         minSdk {
             version = release(NEWPIPE_VERSION_SDK_MIN)
         }
@@ -60,20 +51,12 @@ configure<ApplicationExtension> {
         debug {
             isDebuggable = true
 
-            // suffix the app id and the app name with git branch name
-            if (normalizedWorkingBranch.isEmpty() || workingBranch in defaultBranches) {
-                applicationIdSuffix = ".debug"
-                resValue("string", "app_name", "NewPipe Debug")
-            } else {
-                applicationIdSuffix = ".debug.$normalizedWorkingBranch"
-                resValue("string", "app_name", "NewPipe $workingBranch")
-            }
+            applicationIdSuffix = ".debug"
         }
 
         release {
             System.getProperty("packageSuffix")?.let { suffix ->
                 applicationIdSuffix = suffix
-                resValue("string", "app_name", "NewPipe $suffix")
             }
             isMinifyEnabled = true
             isShrinkResources = true
@@ -88,14 +71,7 @@ configure<ApplicationExtension> {
             signingConfig = signingConfigs.getByName("debug")
             isDefault = true
 
-            // suffix the app id and the app name with git branch name
-            if (normalizedWorkingBranch.isEmpty() || workingBranch in defaultBranches) {
-                applicationIdSuffix = ".continuous"
-                resValue("string", "app_name", "NewPipe Continuous")
-            } else {
-                applicationIdSuffix = ".continuous.$normalizedWorkingBranch"
-                resValue("string", "app_name", "NewPipe $workingBranch")
-            }
+            applicationIdSuffix = ".continuous"
         }
     }
 

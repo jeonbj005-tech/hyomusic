@@ -177,6 +177,10 @@ public class HistoryRecordManager {
         return streamHistoryTable.getHistorySortedById().subscribeOn(Schedulers.io());
     }
 
+    public Flowable<List<StreamHistoryEntry>> getStreamHistory() {
+        return streamHistoryTable.getHistory().subscribeOn(Schedulers.io());
+    }
+
     public Flowable<List<StreamStatisticsEntry>> getStreamStatistics() {
         return streamHistoryTable.getStatistics().subscribeOn(Schedulers.io());
     }

@@ -114,7 +114,6 @@ import org.schabi.newpipe.util.Localization;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.PermissionHelper;
 import org.schabi.newpipe.util.PlayButtonHelper;
-import org.schabi.newpipe.util.StreamTypeUtil;
 import org.schabi.newpipe.util.ThemeHelper;
 import org.schabi.newpipe.util.external_communication.KoreUtils;
 import org.schabi.newpipe.util.external_communication.ShareUtils;
@@ -1632,8 +1631,7 @@ public final class VideoDetailFragment
             }
         }
 
-        binding.detailControlsDownload.setVisibility(
-                StreamTypeUtil.isLiveStream(info.getStreamType()) ? View.GONE : View.VISIBLE);
+        binding.detailControlsDownload.setVisibility(View.GONE);
         binding.detailControlsBackground.setVisibility(
                 info.getAudioStreams().isEmpty() && info.getVideoStreams().isEmpty()
                         ? View.GONE : View.VISIBLE);
