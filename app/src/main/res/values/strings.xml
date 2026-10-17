@@ -18,6 +18,12 @@
     <string name="simple_tunes_gemini_loading">Gemini is creating a playlist…</string>
     <string name="simple_tunes_gemini_empty">No recommended songs were found.</string>
     <string name="simple_tunes_gemini_error">Could not create a Gemini playlist.</string>
+    <string name="simple_tunes_view_all">View all</string>
+    <string name="simple_tunes_thumbnail">Album thumbnail</string>
+    <string name="simple_tunes_frequent_playlists">Frequently played playlists</string>
+    <string name="simple_tunes_my_playlists">My playlists</string>
+    <string name="simple_tunes_playlist_empty">Tap to browse your playlists</string>
+    <string name="simple_tunes_playlist_count">%1$d songs</string>
     <string name="simple_tunes_recent_title">Recent music</string>
     <string name="simple_tunes_recent_subtitle">Tap to listen again</string>
     <string name="simple_tunes_loading">Loading 10 songs…</string>

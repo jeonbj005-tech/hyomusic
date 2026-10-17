@@ -77,6 +77,7 @@ APK 출력 위치는 `app/build/outputs/apk/debug/app-debug.apk`입니다.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.13.apk`, versionCode 1027. 즐겨찾기·이어듣기·전체 연속재생 버튼을 제거하고 검색창 오른쪽에 글자형 `재생목록` 버튼을 배치. assembleDebug 및 단위 테스트 성공.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.14.apk`, versionCode 1028. Gemini API 키와 자연어 요청으로 YouTube 검색 결과를 만들고 기존 재생목록에 추가하는 기능을 제공. API 키는 앱 로컬 설정에만 저장. assembleDebug 및 단위 테스트 성공.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.15.apk`, versionCode 1029. 미니 플레이어에 재생/일시정지와 이전/다음 곡 컨트롤을 항상 표시하고, 종료된 Gemini 2.0 대신 최신 Gemini 3.8 Flash 모델을 사용. 단일 곡에서는 이전이 재시작, 완료된 큐에서는 다음이 순환. assembleDebug 및 단위 테스트 성공.
+- 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.16.apk`, versionCode 1030. 홈 화면에 실제 재생 기록 기반 최근 3곡과 자주 듣는 재생목록 바로가기를 추가하고, 기록이 없으면 장르 검색 결과로 대체. 썸네일·곡명·가수·재생 버튼, 현재 재생 곡 상태 애니메이션, 고정 미니 플레이어와 스크롤 영역을 유지. assembleDebug 및 단위 테스트 성공.
 - 홈 화면에 현재 재생 카드, 상단 검색/설정, 저장형 4색 테마 선택 추가
 - 홈 UI: 네이비 배경, 그라데이션 헤더, 둥근 장르 카드
 - 장르 검색은 YouTube 일반 음악 검색 결과에서 스트림 최대 10개를 큐에 추가

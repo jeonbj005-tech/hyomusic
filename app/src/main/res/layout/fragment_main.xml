@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/simple_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -33,6 +34,61 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="58dp" android:layout_marginTop="8dp" android:orientation="horizontal">
         <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_classical" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginEnd="4dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:minHeight="0dp" android:text="♪  Classical  ·  10" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="16sp" />
         <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_oldies" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginStart="4dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:minHeight="0dp" android:text="◷  Oldies  ·  10" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="16sp" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/recent_section" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:orientation="vertical" android:visibility="gone">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="36dp" android:gravity="center_vertical" android:orientation="horizontal">
+            <org.schabi.newpipe.views.NewPipeTextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/simple_tunes_recent_title" android:textColor="#F7F8FF" android:textSize="19sp" android:textStyle="bold" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/recent_all" android:layout_width="wrap_content" android:layout_height="32dp" android:background="@android:color/transparent" android:minHeight="0dp" android:text="@string/simple_tunes_view_all" android:textAllCaps="false" android:textColor="#9EB8F8" android:textSize="13sp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/recent_item_1" android:layout_width="match_parent" android:layout_height="72dp" android:layout_marginTop="6dp" android:background="@drawable/simple_tunes_action" android:gravity="center_vertical" android:orientation="horizontal" android:padding="8dp">
+            <ImageView android:id="@+id/recent_thumbnail_1" android:layout_width="56dp" android:layout_height="56dp" android:contentDescription="@string/simple_tunes_thumbnail" android:scaleType="centerCrop" android:src="@drawable/placeholder_thumbnail_video" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:layout_weight="1" android:orientation="vertical">
+                <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/recent_title_1" android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="end" android:maxLines="1" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/recent_artist_1" android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="end" android:maxLines="1" android:textColor="#AEB8D3" android:textSize="13sp" />
+            </LinearLayout>
+            <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/recent_equalizer_1" android:layout_width="32dp" android:layout_height="wrap_content" android:gravity="center" android:text="▂▅▇" android:textColor="#9CC7FF" android:textSize="11sp" android:visibility="gone" />
+            <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/recent_play_1" android:layout_width="42dp" android:layout_height="42dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/play" android:padding="9dp" android:src="@drawable/ic_play_arrow" app:tint="#FFFFFF" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/recent_item_2" android:layout_width="match_parent" android:layout_height="72dp" android:layout_marginTop="6dp" android:background="@drawable/simple_tunes_action" android:gravity="center_vertical" android:orientation="horizontal" android:padding="8dp">
+            <ImageView android:id="@+id/recent_thumbnail_2" android:layout_width="56dp" android:layout_height="56dp" android:contentDescription="@string/simple_tunes_thumbnail" android:scaleType="centerCrop" android:src="@drawable/placeholder_thumbnail_video" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:layout_weight="1" android:orientation="vertical">
+                <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/recent_title_2" android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="end" android:maxLines="1" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/recent_artist_2" android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="end" android:maxLines="1" android:textColor="#AEB8D3" android:textSize="13sp" />
+            </LinearLayout>
+            <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/recent_equalizer_2" android:layout_width="32dp" android:layout_height="wrap_content" android:gravity="center" android:text="▂▅▇" android:textColor="#9CC7FF" android:textSize="11sp" android:visibility="gone" />
+            <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/recent_play_2" android:layout_width="42dp" android:layout_height="42dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/play" android:padding="9dp" android:src="@drawable/ic_play_arrow" app:tint="#FFFFFF" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/recent_item_3" android:layout_width="match_parent" android:layout_height="72dp" android:layout_marginTop="6dp" android:background="@drawable/simple_tunes_action" android:gravity="center_vertical" android:orientation="horizontal" android:padding="8dp">
+            <ImageView android:id="@+id/recent_thumbnail_3" android:layout_width="56dp" android:layout_height="56dp" android:contentDescription="@string/simple_tunes_thumbnail" android:scaleType="centerCrop" android:src="@drawable/placeholder_thumbnail_video" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:layout_weight="1" android:orientation="vertical">
+                <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/recent_title_3" android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="end" android:maxLines="1" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/recent_artist_3" android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="end" android:maxLines="1" android:textColor="#AEB8D3" android:textSize="13sp" />
+            </LinearLayout>
+            <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/recent_equalizer_3" android:layout_width="32dp" android:layout_height="wrap_content" android:gravity="center" android:text="▂▅▇" android:textColor="#9CC7FF" android:textSize="11sp" android:visibility="gone" />
+            <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/recent_play_3" android:layout_width="42dp" android:layout_height="42dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/play" android:padding="9dp" android:src="@drawable/ic_play_arrow" app:tint="#FFFFFF" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:id="@+id/quick_playlists_section" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:orientation="vertical">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="36dp" android:gravity="center_vertical" android:orientation="horizontal">
+            <org.schabi.newpipe.views.NewPipeTextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/simple_tunes_frequent_playlists" android:textColor="#F7F8FF" android:textSize="19sp" android:textStyle="bold" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/playlist_all" android:layout_width="wrap_content" android:layout_height="32dp" android:background="@android:color/transparent" android:minHeight="0dp" android:text="@string/simple_tunes_view_all" android:textAllCaps="false" android:textColor="#9EB8F8" android:textSize="13sp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/quick_playlist_1" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginTop="6dp" android:background="@drawable/simple_tunes_action" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="16dp" android:paddingEnd="16dp">
+            <androidx.appcompat.widget.AppCompatImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_history" app:tint="#9CC7FF" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
+                <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/quick_playlist_title_1" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/simple_tunes_recent_title" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/quick_playlist_subtitle_1" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/simple_tunes_recent_subtitle" android:textColor="#AEB8D3" android:textSize="13sp" />
+            </LinearLayout>
+            <org.schabi.newpipe.views.NewPipeTextView android:layout_width="24dp" android:layout_height="wrap_content" android:gravity="center" android:text="›" android:textColor="#9EB8F8" android:textSize="28sp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/quick_playlist_2" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginTop="6dp" android:background="@drawable/simple_tunes_action" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="16dp" android:paddingEnd="16dp">
+            <androidx.appcompat.widget.AppCompatImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_playlist_play" app:tint="#D4A7FF" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
+                <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/quick_playlist_title_2" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/simple_tunes_my_playlists" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                <org.schabi.newpipe.views.NewPipeTextView android:id="@+id/quick_playlist_subtitle_2" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/simple_tunes_playlist_empty" android:textColor="#AEB8D3" android:textSize="13sp" />
+            </LinearLayout>
+            <org.schabi.newpipe.views.NewPipeTextView android:layout_width="24dp" android:layout_height="wrap_content" android:gravity="center" android:text="›" android:textColor="#9EB8F8" android:textSize="28sp" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
 </androidx.core.widget.NestedScrollView>

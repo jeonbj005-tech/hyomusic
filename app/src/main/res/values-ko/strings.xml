@@ -18,6 +18,12 @@
     <string name="simple_tunes_gemini_loading">Gemini가 재생목록을 만드는 중…</string>
     <string name="simple_tunes_gemini_empty">추천 곡을 찾지 못했습니다.</string>
     <string name="simple_tunes_gemini_error">Gemini 재생목록을 만들지 못했습니다.</string>
+    <string name="simple_tunes_view_all">전체 보기</string>
+    <string name="simple_tunes_thumbnail">앨범 썸네일</string>
+    <string name="simple_tunes_frequent_playlists">자주 듣는 재생목록</string>
+    <string name="simple_tunes_my_playlists">내 재생목록</string>
+    <string name="simple_tunes_playlist_empty">재생목록을 보려면 눌러 주세요</string>
+    <string name="simple_tunes_playlist_count">노래 %1$d곡</string>
     <string name="simple_tunes_recent_title">최근 들은 음악</string>
     <string name="simple_tunes_recent_subtitle">눌러서 다시 듣기</string>
     <string name="simple_tunes_loading">노래 10곡을 불러오는 중…</string>

@@ -74,6 +74,11 @@ public final class PlayerHolder {
         return getPlayer().map(Player::isPlaying).orElse(false);
     }
 
+    @Nullable
+    public org.schabi.newpipe.player.playqueue.PlayQueueItem getCurrentItem() {
+        return getPlayer().map(Player::getCurrentItem).orElse(null);
+    }
+
     public boolean isPlayerOpen() {
         return getPlayer().isPresent();
     }

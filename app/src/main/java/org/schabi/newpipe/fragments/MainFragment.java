@@ -16,6 +16,8 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,15 +26,22 @@ import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.BaseFragment;
 import org.schabi.newpipe.DownloaderImpl;
+import org.schabi.newpipe.NewPipeDatabase;
 import org.schabi.newpipe.R;
+import org.schabi.newpipe.database.history.model.StreamHistoryEntry;
+import org.schabi.newpipe.database.playlist.PlaylistMetadataEntry;
 import org.schabi.newpipe.database.stream.model.StreamEntity;
 import org.schabi.newpipe.databinding.FragmentMainBinding;
 import org.schabi.newpipe.extractor.ServiceList;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.local.dialog.PlaylistDialog;
+import org.schabi.newpipe.local.history.HistoryRecordManager;
+import org.schabi.newpipe.local.playlist.LocalPlaylistManager;
+import org.schabi.newpipe.player.helper.PlayerHolder;
 import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
 import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.NavigationHelper;
+import org.schabi.newpipe.util.image.CoilHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -54,6 +63,8 @@ import okhttp3.Response;
 public class MainFragment extends BaseFragment {
     private FragmentMainBinding binding;
     private final CompositeDisposable disposables = new CompositeDisposable();
+    private HistoryRecordManager historyRecordManager;
+    private LocalPlaylistManager localPlaylistManager;
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater,
@@ -75,6 +86,10 @@ public class MainFragment extends BaseFragment {
         binding.hyoPlaylist.setOnClickListener(view ->
                 NavigationHelper.openBookmarksFragment(getFM()));
         binding.hyoGemini.setOnClickListener(view -> showGeminiPrompt());
+        binding.recentAll.setOnClickListener(view ->
+                NavigationHelper.openStatisticFragment(getFM()));
+        binding.playlistAll.setOnClickListener(view ->
+                NavigationHelper.openBookmarksFragment(getFM()));
         binding.hyoPop.setOnClickListener(view -> playGenre("pop music"));
         binding.hyoRock.setOnClickListener(view -> playGenre("rock music"));
         binding.hyoBallad.setOnClickListener(view -> playGenre("ballad music"));
@@ -82,7 +97,147 @@ public class MainFragment extends BaseFragment {
         binding.hyoClassical.setOnClickListener(view -> playGenre("classical music"));
         binding.hyoOldies.setOnClickListener(view -> playGenre("oldies music"));
         binding.themeButton.setOnClickListener(view -> showThemePicker());
+        addPressAnimation(binding.hyoSearch);
+        addPressAnimation(binding.hyoPlaylist);
+        addPressAnimation(binding.hyoGemini);
+        addPressAnimation(binding.recentAll);
+        addPressAnimation(binding.playlistAll);
+        addPressAnimation(binding.themeButton);
+        addPressAnimation(binding.hyoPop);
+        addPressAnimation(binding.hyoRock);
+        addPressAnimation(binding.hyoBallad);
+        addPressAnimation(binding.hyoJazz);
+        addPressAnimation(binding.hyoClassical);
+        addPressAnimation(binding.hyoOldies);
         colorizeGenreIcons();
+        loadHomeCollections();
+    }
+
+    private void loadHomeCollections() {
+        historyRecordManager = new HistoryRecordManager(requireContext());
+        localPlaylistManager = new LocalPlaylistManager(
+                NewPipeDatabase.getInstance(requireContext()));
+        disposables.add(historyRecordManager.getStreamHistory()
+                .take(1)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(entries -> {
+                    final List<StreamInfoItem> recent = entries.stream()
+                            .limit(3)
+                            .map(StreamHistoryEntry::toStreamInfoItem)
+                            .collect(Collectors.toList());
+                    if (recent.isEmpty()) {
+                        loadFallbackRecent();
+                    } else {
+                        bindRecent(recent);
+                    }
+                }, throwable -> loadFallbackRecent()));
+        disposables.add(localPlaylistManager.getPlaylists()
+                .take(1)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::bindQuickPlaylists,
+                        throwable -> bindQuickPlaylists(Collections.emptyList())));
+    }
+
+    private void loadFallbackRecent() {
+        disposables.add(ExtractorHelper.searchFor(ServiceList.YouTube.getServiceId(),
+                        "pop music official audio", Collections.emptyList(), "")
+                .subscribeOn(Schedulers.io())
+                .map(result -> result.getRelatedItems().stream()
+                        .filter(item -> item instanceof StreamInfoItem)
+                        .map(item -> (StreamInfoItem) item)
+                        .limit(3)
+                        .collect(Collectors.toList()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::bindRecent, throwable -> bindRecent(Collections.emptyList())));
+    }
+
+    private void bindRecent(final List<StreamInfoItem> items) {
+        final View[] cards = {binding.recentItem1, binding.recentItem2, binding.recentItem3};
+        final android.widget.ImageView[] thumbnails = {binding.recentThumbnail1,
+                binding.recentThumbnail2, binding.recentThumbnail3};
+        final org.schabi.newpipe.views.NewPipeTextView[] titles = {binding.recentTitle1,
+                binding.recentTitle2, binding.recentTitle3};
+        final org.schabi.newpipe.views.NewPipeTextView[] artists = {binding.recentArtist1,
+                binding.recentArtist2, binding.recentArtist3};
+        final org.schabi.newpipe.views.NewPipeTextView[] equalizers = {binding.recentEqualizer1,
+                binding.recentEqualizer2, binding.recentEqualizer3};
+        final View[] playButtons = {binding.recentPlay1, binding.recentPlay2, binding.recentPlay3};
+        final org.schabi.newpipe.player.playqueue.PlayQueueItem currentItem =
+                PlayerHolder.getInstance().getCurrentItem();
+        final boolean playerIsPlaying = PlayerHolder.getInstance().isPlaying();
+        binding.recentSection.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
+        for (int i = 0; i < cards.length; i++) {
+            if (i >= items.size()) {
+                cards[i].setVisibility(View.GONE);
+                continue;
+            }
+            final StreamInfoItem item = items.get(i);
+            cards[i].setVisibility(View.VISIBLE);
+            titles[i].setText(item.getName());
+            artists[i].setText(item.getUploaderName());
+            CoilHelper.INSTANCE.loadThumbnail(thumbnails[i], item.getThumbnails());
+            final boolean isPlaying = playerIsPlaying && currentItem != null
+                    && item.getUrl().equals(currentItem.getUrl());
+            equalizers[i].setVisibility(isPlaying ? View.VISIBLE : View.GONE);
+            equalizers[i].clearAnimation();
+            if (isPlaying) {
+                startEqualizerAnimation(equalizers[i]);
+            }
+            final View.OnClickListener play = view -> NavigationHelper.playOnBackgroundPlayer(
+                    requireContext(), new SinglePlayQueue(item), true);
+            cards[i].setOnClickListener(play);
+            playButtons[i].setOnClickListener(play);
+            addPressAnimation(cards[i]);
+            addPressAnimation(playButtons[i]);
+        }
+    }
+
+    private void startEqualizerAnimation(final View view) {
+        final Animation animation = new AlphaAnimation(0.35f, 1f);
+        animation.setDuration(420);
+        animation.setRepeatMode(Animation.REVERSE);
+        animation.setRepeatCount(Animation.INFINITE);
+        view.startAnimation(animation);
+    }
+
+    private void bindQuickPlaylists(final List<PlaylistMetadataEntry> playlists) {
+        binding.quickPlaylist1.setOnClickListener(view ->
+                NavigationHelper.openStatisticFragment(getFM()));
+        binding.quickPlaylistTitle1.setText(R.string.simple_tunes_recent_title);
+        binding.quickPlaylistSubtitle1.setText(R.string.simple_tunes_recent_subtitle);
+        if (playlists.isEmpty()) {
+            binding.quickPlaylistTitle2.setText(R.string.simple_tunes_my_playlists);
+            binding.quickPlaylistSubtitle2.setText(R.string.simple_tunes_playlist_empty);
+            binding.quickPlaylist2.setOnClickListener(view ->
+                    NavigationHelper.openBookmarksFragment(getFM()));
+        } else {
+            final PlaylistMetadataEntry playlist = playlists.get(0);
+            binding.quickPlaylistTitle2.setText(playlist.getOrderingName());
+            binding.quickPlaylistSubtitle2.setText(getString(
+                    R.string.simple_tunes_playlist_count, playlist.getStreamCount()));
+            binding.quickPlaylist2.setOnClickListener(view ->
+                    NavigationHelper.openLocalPlaylistFragment(getFM(), playlist.getUid(),
+                            playlist.getOrderingName()));
+        }
+        addPressAnimation(binding.quickPlaylist1);
+        addPressAnimation(binding.quickPlaylist2);
+    }
+
+    private void addPressAnimation(final View view) {
+        view.setOnTouchListener((target, event) -> {
+            switch (event.getActionMasked()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    target.animate().scaleX(0.98f).scaleY(0.98f).setDuration(170).start();
+                    break;
+                case android.view.MotionEvent.ACTION_UP:
+                case android.view.MotionEvent.ACTION_CANCEL:
+                    target.animate().scaleX(1f).scaleY(1f).setDuration(170).start();
+                    break;
+                default:
+                    break;
+            }
+            return false;
+        });
     }
 
     private void colorizeGenreIcons() {
@@ -293,6 +448,11 @@ public class MainFragment extends BaseFragment {
         styleCard(binding.hyoJazz, card, Color.rgb(74, 196, 178));
         styleCard(binding.hyoClassical, card, Color.rgb(245, 187, 104));
         styleCard(binding.hyoOldies, card, Color.rgb(133, 174, 230));
+        styleCard(binding.recentItem1, card, second);
+        styleCard(binding.recentItem2, card, second);
+        styleCard(binding.recentItem3, card, second);
+        styleCard(binding.quickPlaylist1, card, first);
+        styleCard(binding.quickPlaylist2, card, first);
         PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
                 .putInt("simple_tunes_theme", theme).apply();
     }
