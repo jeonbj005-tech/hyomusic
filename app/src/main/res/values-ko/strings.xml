@@ -10,16 +10,6 @@
     <string name="simple_tunes_genres">장르별 추천</string>
     <string name="simple_tunes_theme_title">색상 테마</string>
     <string name="simple_tunes_theme_button">색상 테마 선택</string>
-    <string name="simple_tunes_gemini_playlist">Gemini AI로 재생목록 만들기</string>
-    <string name="simple_tunes_gemini_prompt_hint">예: 90년대 한국 발라드 10곡</string>
-    <string name="simple_tunes_gemini_api_key_title">Gemini API 키</string>
-    <string name="simple_tunes_gemini_api_key_hint">AIza… 키를 입력하세요</string>
-    <string name="simple_tunes_gemini_api_key_required">먼저 Gemini API 키를 입력해 주세요.</string>
-    <string name="simple_tunes_gemini_api_key_invalid">Google AI Studio API 키는 AIza로 시작하는 영문 키를 입력해 주세요.</string>
-    <string name="simple_tunes_gemini_loading">Gemini가 재생목록을 만드는 중…</string>
-    <string name="simple_tunes_gemini_empty">추천 곡을 찾지 못했습니다.</string>
-    <string name="simple_tunes_gemini_error">Gemini 재생목록을 만들지 못했습니다.</string>
-    <string name="simple_tunes_gemini_error_detail">Gemini 오류: %1$s</string>
     <string name="simple_tunes_view_all">전체 보기</string>
     <string name="simple_tunes_thumbnail">앨범 썸네일</string>
     <string name="simple_tunes_frequent_playlists">자주 듣는 재생목록</string>

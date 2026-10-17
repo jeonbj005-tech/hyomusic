@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.text.InputType;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -25,16 +24,13 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.BaseFragment;
-import org.schabi.newpipe.DownloaderImpl;
 import org.schabi.newpipe.NewPipeDatabase;
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.database.history.model.StreamHistoryEntry;
 import org.schabi.newpipe.database.playlist.PlaylistMetadataEntry;
-import org.schabi.newpipe.database.stream.model.StreamEntity;
 import org.schabi.newpipe.databinding.FragmentMainBinding;
 import org.schabi.newpipe.extractor.ServiceList;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
-import org.schabi.newpipe.local.dialog.PlaylistDialog;
 import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.local.playlist.LocalPlaylistManager;
 import org.schabi.newpipe.player.helper.PlayerHolder;
@@ -42,23 +38,14 @@ import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
 import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.image.CoilHelper;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Maybe;
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class MainFragment extends BaseFragment {
     private FragmentMainBinding binding;
@@ -85,7 +72,6 @@ public class MainFragment extends BaseFragment {
                 getFM(), ServiceList.YouTube.getServiceId(), ""));
         binding.hyoPlaylist.setOnClickListener(view ->
                 NavigationHelper.openBookmarksFragment(getFM()));
-        binding.hyoGemini.setOnClickListener(view -> showGeminiPrompt());
         binding.recentAll.setOnClickListener(view ->
                 NavigationHelper.openStatisticFragment(getFM()));
         binding.playlistAll.setOnClickListener(view ->
@@ -99,7 +85,6 @@ public class MainFragment extends BaseFragment {
         binding.themeButton.setOnClickListener(view -> showThemePicker());
         addPressAnimation(binding.hyoSearch);
         addPressAnimation(binding.hyoPlaylist);
-        addPressAnimation(binding.hyoGemini);
         addPressAnimation(binding.recentAll);
         addPressAnimation(binding.playlistAll);
         addPressAnimation(binding.themeButton);
@@ -271,182 +256,6 @@ public class MainFragment extends BaseFragment {
                 .show();
     }
 
-    private void showGeminiPrompt() {
-        final String savedKey = normalizeGeminiApiKey(PreferenceManager
-                .getDefaultSharedPreferences(requireContext())
-                .getString("simple_tunes_gemini_api_key", ""));
-        if (!isGeminiApiKeyValid(savedKey)) {
-            showGeminiApiKeyDialog();
-            return;
-        }
-        final android.widget.EditText input = new android.widget.EditText(requireContext());
-        input.setHint(R.string.simple_tunes_gemini_prompt_hint);
-        input.setSingleLine(true);
-        input.setPadding(32, 8, 32, 8);
-        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle(R.string.simple_tunes_gemini_playlist)
-                .setView(input)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    final String prompt = input.getText().toString().trim();
-                    if (!prompt.isEmpty()) {
-                        generateGeminiPlaylist(savedKey, prompt);
-                    }
-                })
-                .show();
-    }
-
-    private void showGeminiApiKeyDialog() {
-        final android.widget.EditText input = new android.widget.EditText(requireContext());
-        input.setHint(R.string.simple_tunes_gemini_api_key_hint);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        input.setSingleLine(true);
-        input.setPadding(32, 8, 32, 8);
-        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle(R.string.simple_tunes_gemini_api_key_title)
-                .setView(input)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    final String key = normalizeGeminiApiKey(input.getText().toString());
-                    if (key.isEmpty()) {
-                        Toast.makeText(requireContext(),
-                                R.string.simple_tunes_gemini_api_key_required,
-                                Toast.LENGTH_SHORT).show();
-                    } else if (!isGeminiApiKeyValid(key)) {
-                        Toast.makeText(requireContext(),
-                                R.string.simple_tunes_gemini_api_key_invalid,
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
-                                .putString("simple_tunes_gemini_api_key", key).apply();
-                        showGeminiPrompt();
-                    }
-                })
-                .show();
-    }
-
-    private String normalizeGeminiApiKey(final String key) {
-        return key == null ? "" : key.trim().replaceAll("[\\s\"'`]", "");
-    }
-
-    private boolean isGeminiApiKeyValid(final String key) {
-        return key.matches("AIza[0-9A-Za-z_-]{20,}");
-    }
-
-    private void generateGeminiPlaylist(final String apiKey, final String prompt) {
-        if (!isGeminiApiKeyValid(apiKey)) {
-            Toast.makeText(requireContext(), R.string.simple_tunes_gemini_api_key_invalid,
-                    Toast.LENGTH_LONG).show();
-            return;
-        }
-        Toast.makeText(requireContext(), R.string.simple_tunes_gemini_loading,
-                Toast.LENGTH_SHORT).show();
-        disposables.add(Observable.fromCallable(() -> requestGeminiQueries(apiKey, prompt))
-                .subscribeOn(Schedulers.io())
-                .flatMapIterable(queries -> queries)
-                .concatMapMaybe(query -> ExtractorHelper.searchFor(
-                                ServiceList.YouTube.getServiceId(), query,
-                                Collections.emptyList(), "")
-                        .subscribeOn(Schedulers.io())
-                        .map(result -> result.getRelatedItems().stream()
-                                .filter(item -> item instanceof StreamInfoItem)
-                                .map(item -> (StreamInfoItem) item)
-                                .findFirst()
-                                .orElse(null))
-                        .flatMapMaybe(item -> item == null ? Maybe.empty() : Maybe.just(item))
-                        .onErrorResumeWith(Maybe.empty()))
-                .take(10)
-                .toList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::appendGeminiResults, this::showGeminiError));
-    }
-
-    private void showGeminiError(final Throwable throwable) {
-        String detail = throwable.getMessage();
-        if (detail == null || detail.trim().isEmpty()) {
-            detail = throwable.getClass().getSimpleName();
-        }
-        detail = detail.replace('\n', ' ');
-        if (detail.length() > 180) {
-            detail = detail.substring(0, 180) + "…";
-        }
-        Toast.makeText(requireContext(), getString(R.string.simple_tunes_gemini_error_detail,
-                detail), Toast.LENGTH_LONG).show();
-    }
-
-    private List<String> requestGeminiQueries(final String apiKey, final String prompt)
-            throws Exception {
-        final JSONObject requestJson = new JSONObject()
-                .put("contents", new JSONArray().put(new JSONObject().put("parts",
-                        new JSONArray().put(new JSONObject().put("text",
-                                "You create a YouTube music playlist. Return only a JSON array of "
-                                        + "10 concise search queries, one per song, for this "
-                                        + "request: "
-                                        + prompt)))))
-                .put("generationConfig", new JSONObject().put("temperature", 0.6));
-        String lastError = "Gemini request failed";
-        for (final String model : new String[]{"gemini-3.8-flash", "gemini-2.5-flash"}) {
-            final Request request = new Request.Builder()
-                    .url("https://generativelanguage.googleapis.com/v1beta/models/"
-                            + model + ":generateContent")
-                    .header("x-goog-api-key", apiKey)
-                    .post(RequestBody.create(requestJson.toString(), MediaType.get(
-                            "application/json; charset=utf-8")))
-                    .build();
-            try (Response response = DownloaderImpl.getInstance().getClient()
-                    .newCall(request).execute()) {
-                final String body = response.body() == null ? "" : response.body().string();
-                if (!response.isSuccessful()) {
-                    lastError = "HTTP " + response.code() + ": " + geminiErrorDetail(body);
-                    if (response.code() == 400 || response.code() == 404) {
-                        continue;
-                    }
-                    throw new IllegalStateException(lastError);
-                }
-                final JSONObject root = new JSONObject(body);
-                final String text = root.getJSONArray("candidates").getJSONObject(0)
-                        .getJSONObject("content").getJSONArray("parts").getJSONObject(0)
-                        .getString("text").replace("```json", "").replace("```", "").trim();
-                final int start = text.indexOf('[');
-                final int end = text.lastIndexOf(']');
-                if (start < 0 || end <= start) {
-                    throw new IllegalStateException("Gemini returned no query list");
-                }
-                final JSONArray queriesJson = new JSONArray(text.substring(start, end + 1));
-                final List<String> queries = new ArrayList<>();
-                for (int i = 0; i < queriesJson.length() && queries.size() < 10; i++) {
-                    final String query = queriesJson.optString(i).trim();
-                    if (!query.isEmpty()) {
-                        queries.add(query);
-                    }
-                }
-                return queries;
-            }
-        }
-        throw new IllegalStateException(lastError);
-    }
-
-    private String geminiErrorDetail(final String body) {
-        try {
-            final JSONObject error = new JSONObject(body).optJSONObject("error");
-            return error == null ? body : error.optString("message", body);
-        } catch (final Exception ignored) {
-            return body.isEmpty() ? "unknown error" : body;
-        }
-    }
-
-    private void appendGeminiResults(final List<StreamInfoItem> items) {
-        if (items.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.simple_tunes_gemini_empty,
-                    Toast.LENGTH_LONG).show();
-            return;
-        }
-        final List<StreamEntity> entities = items.stream().map(StreamEntity::new)
-                .collect(Collectors.toList());
-        disposables.add(PlaylistDialog.createCorrespondingDialog(requireContext(), entities,
-                dialog -> dialog.show(getParentFragmentManager(), "GeminiPlaylistDialog")));
-    }
-
     private void applyTheme(final int theme) {
         final int background;
         final int card;
@@ -481,7 +290,6 @@ public class MainFragment extends BaseFragment {
         binding.simpleRoot.setBackgroundColor(background);
         styleCard(binding.hyoSearch, card, second);
         styleCard(binding.hyoPlaylist, card, second);
-        styleCard(binding.hyoGemini, card, first);
         // The activity toolbar and status bar are outside fragment_main.xml. Keep them
         // in the same palette so the home screen does not start with an unrelated red bar.
         final View toolbar = requireActivity().findViewById(R.id.toolbar);
