@@ -81,6 +81,7 @@ APK 출력 위치는 `app/build/outputs/apk/debug/app-debug.apk`입니다.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.17.apk`, versionCode 1031. 작은 화면에 맞게 홈 카드 밀도를 줄이고, Gemini 3.8 실패 시 Gemini 2.5 Flash로 재시도하며 API 오류 원인을 표시. assembleDebug 및 단위 테스트 성공.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.18.apk`, versionCode 1032. Gemini API 키 입력을 `AIza` 형식으로 검증하고 공백·따옴표를 정리해 헤더 오류를 방지. 잘못된 키는 요청 전에 안내. assembleDebug 및 단위 테스트 성공.
 - 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.19.apk`, versionCode 1033. Gemini AI 버튼·API 키 입력·네트워크 호출을 제거하고 검색, 장르 재생, 최근 음악, 재생목록 기능만 유지. assembleDebug 및 단위 테스트 성공.
+- 최신 APK: `SimpleTunes-debug-v0.29.1-hyo.20.apk`, versionCode 1034. GitHub 브랜치의 `update.json`을 조회해 최신 APK 버전을 비교하고, 업데이트가 있으면 다운로드 알림을 표시. 기존 업데이트 설정의 수동 확인과 자동 알림을 SimpleTunes APK에 연결. assembleDebug 및 단위 테스트 성공.
 - 홈 화면에 현재 재생 카드, 상단 검색/설정, 저장형 4색 테마 선택 추가
 - 홈 UI: 네이비 배경, 그라데이션 헤더, 둥근 장르 카드
 - 장르 검색은 YouTube 일반 음악 검색 결과에서 스트림 최대 10개를 큐에 추가

@@ -89,11 +89,6 @@ class NewVersionWorker(
 
     @Throws(IOException::class, ReCaptchaException::class)
     private fun checkNewVersion() {
-        // Check if the current apk is a github one or not.
-        if (!ReleaseVersionUtil.isReleaseApk) {
-            return
-        }
-
         if (!inputData.getBoolean(IS_MANUAL, false)) {
             val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
             // Check if the last request has happened a certain time ago
@@ -104,8 +99,8 @@ class NewVersionWorker(
             }
         }
 
-        // Make a network request to get latest NewPipe data.
-        val response = DownloaderImpl.getInstance().get(NEWPIPE_API_URL)
+        // Read the SimpleTunes manifest from the GitHub branch.
+        val response = DownloaderImpl.getInstance().get(SIMPLE_TUNES_UPDATE_URL)
         handleResponse(response)
     }
 
@@ -126,19 +121,17 @@ class NewVersionWorker(
 
         // Parse the json from the response.
         try {
-            val newpipeVersionInfo = JsonParser.`object`()
-                .from(response.responseBody()).getObject("flavors")
-                .getObject("newpipe")
-
-            val versionName = newpipeVersionInfo.getString("version")
-            val versionCode = newpipeVersionInfo.getInt("version_code")
-            val apkLocationUrl = newpipeVersionInfo.getString("apk")
+            val latestVersionInfo = JsonParser.`object`().from(response.responseBody())
+                .getObject("latest")
+            val versionName = latestVersionInfo.getString("version_name")
+            val versionCode = latestVersionInfo.getInt("version_code")
+            val apkLocationUrl = latestVersionInfo.getString("apk")
             compareAppVersionAndShowNotification(versionName, apkLocationUrl, versionCode)
         } catch (e: JsonParserException) {
             // Most likely something is wrong in data received from NEWPIPE_API_URL.
             // Do not alarm user and fail silently.
             if (DEBUG) {
-                Log.w(TAG, "Could not get NewPipe API: invalid json", e)
+                Log.w(TAG, "Could not get SimpleTunes update manifest: invalid json", e)
             }
         }
     }
@@ -159,18 +152,17 @@ class NewVersionWorker(
     companion object {
         private val DEBUG = MainActivity.DEBUG
         private val TAG = NewVersionWorker::class.java.simpleName
-        private const val NEWPIPE_API_URL = "https://newpipe.net/api/data.json"
+        private const val SIMPLE_TUNES_UPDATE_URL =
+            "https://raw.githubusercontent.com/jeonbj005-tech/hyomusic/hyomusic/update.json"
         private const val IS_MANUAL = "isManual"
 
         /**
          * Start a new worker which checks if all conditions for performing a version check are met,
-         * fetches the API endpoint [.NEWPIPE_API_URL] containing info about the latest NewPipe
-         * version and displays a notification about an available update if one is available.
+         * fetches the GitHub manifest containing the latest SimpleTunes version and displays a
+         * notification about an available update if one is available.
          * <br></br>
          * Following conditions need to be met, before data is requested from the server:
          *
-         *  *  The app is signed with the correct signing key (by TeamNewPipe / schabi).
-         * If the signing key differs from the one used upstream, the update cannot be installed.
          *  * The user enabled searching for and notifying about updates in the settings.
          *  * The app did not recently check for updates.
          * We do not want to make unnecessary connections and DOS our servers.

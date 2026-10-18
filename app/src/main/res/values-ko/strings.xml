@@ -364,7 +364,7 @@
     <string name="list">목록</string>
     <string name="grid">격자</string>
     <string name="auto">자동</string>
-    <string name="app_update_available_notification_title">NewPipe 업데이트를 사용할 수 있습니다!</string>
+    <string name="app_update_available_notification_title">SimpleTunes 업데이트를 사용할 수 있습니다!</string>
     <string name="missions_header_finished">완료됨</string>
     <string name="missions_header_pending">대기열에 있음</string>
     <string name="paused">일시중지됨</string>
@@ -714,7 +714,7 @@
     <string name="sort">정렬</string>
     <string name="fast_mode">빠른 모드</string>
     <string name="import_subscriptions_hint">점 3개 메뉴에서 구독 가져오기 또는 내보내기</string>
-    <string name="app_update_unavailable_toast">최신 버전의 NewPipe를 실행 중입니다</string>
+    <string name="app_update_unavailable_toast">최신 버전의 SimpleTunes를 실행 중입니다</string>
     <string name="app_update_available_notification_text">%s를 다운로드하려면 탭하세요</string>
     <string name="unset_playlist_thumbnail">영구 썸네일 설정 해제</string>
     <string name="night_theme_available">이 옵션은 %s가 테마로 선택되었을 경우에만 사용할 수 있습니다</string>
