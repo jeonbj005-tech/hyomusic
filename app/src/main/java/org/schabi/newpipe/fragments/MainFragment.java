@@ -9,14 +9,22 @@ import android.os.Bundle;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.text.InputType;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,28 +32,42 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.BaseFragment;
+import org.schabi.newpipe.DownloaderImpl;
 import org.schabi.newpipe.NewPipeDatabase;
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.database.history.model.StreamHistoryEntry;
 import org.schabi.newpipe.database.playlist.PlaylistMetadataEntry;
+import org.schabi.newpipe.database.stream.model.StreamEntity;
 import org.schabi.newpipe.databinding.FragmentMainBinding;
 import org.schabi.newpipe.extractor.ServiceList;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
+import org.schabi.newpipe.local.dialog.PlaylistDialog;
 import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.local.playlist.LocalPlaylistManager;
 import org.schabi.newpipe.player.helper.PlayerHolder;
 import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
 import org.schabi.newpipe.util.ExtractorHelper;
+import org.schabi.newpipe.util.MusicRecommendationEngine;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.image.CoilHelper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class MainFragment extends BaseFragment {
     private FragmentMainBinding binding;
@@ -72,19 +94,25 @@ public class MainFragment extends BaseFragment {
                 getFM(), ServiceList.YouTube.getServiceId(), ""));
         binding.hyoPlaylist.setOnClickListener(view ->
                 NavigationHelper.openBookmarksFragment(getFM()));
+        binding.hyoGemini.setOnClickListener(view -> showGeminiPrompt());
         binding.recentAll.setOnClickListener(view ->
                 NavigationHelper.openStatisticFragment(getFM()));
         binding.playlistAll.setOnClickListener(view ->
                 NavigationHelper.openBookmarksFragment(getFM()));
-        binding.hyoPop.setOnClickListener(view -> playGenre("pop music"));
-        binding.hyoRock.setOnClickListener(view -> playGenre("rock music"));
-        binding.hyoBallad.setOnClickListener(view -> playGenre("ballad music"));
-        binding.hyoJazz.setOnClickListener(view -> playGenre("jazz music"));
-        binding.hyoClassical.setOnClickListener(view -> playGenre("classical music"));
-        binding.hyoOldies.setOnClickListener(view -> playGenre("oldies music"));
+        binding.hyoPop.setOnClickListener(view -> showRegionPicker("MUSIC",
+                MusicRecommendationEngine.Mode.TRENDING));
+        binding.hyoRock.setOnClickListener(view -> showRegionPicker("MUSIC",
+                MusicRecommendationEngine.Mode.NEW_RELEASES));
+        binding.hyoBallad.setOnClickListener(view -> showGenrePicker());
+        binding.hyoJazz.setOnClickListener(view -> playPersonalized());
+        binding.hyoClassical.setOnClickListener(view ->
+                NavigationHelper.openBookmarksFragment(getFM()));
+        binding.hyoOldies.setOnClickListener(view ->
+                NavigationHelper.openStatisticFragment(getFM()));
         binding.themeButton.setOnClickListener(view -> showThemePicker());
         addPressAnimation(binding.hyoSearch);
         addPressAnimation(binding.hyoPlaylist);
+        addPressAnimation(binding.hyoGemini);
         addPressAnimation(binding.recentAll);
         addPressAnimation(binding.playlistAll);
         addPressAnimation(binding.themeButton);
@@ -110,30 +138,13 @@ public class MainFragment extends BaseFragment {
                             .limit(3)
                             .map(StreamHistoryEntry::toStreamInfoItem)
                             .collect(Collectors.toList());
-                    if (recent.isEmpty()) {
-                        loadFallbackRecent();
-                    } else {
-                        bindRecent(recent);
-                    }
-                }, throwable -> loadFallbackRecent()));
+                    bindRecent(recent);
+                }, throwable -> bindRecent(Collections.emptyList())));
         disposables.add(localPlaylistManager.getPlaylists()
                 .take(1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::bindQuickPlaylists,
                         throwable -> bindQuickPlaylists(Collections.emptyList())));
-    }
-
-    private void loadFallbackRecent() {
-        disposables.add(ExtractorHelper.searchFor(ServiceList.YouTube.getServiceId(),
-                        "pop music official audio", Collections.emptyList(), "")
-                .subscribeOn(Schedulers.io())
-                .map(result -> result.getRelatedItems().stream()
-                        .filter(item -> item instanceof StreamInfoItem)
-                        .map(item -> (StreamInfoItem) item)
-                        .limit(3)
-                        .collect(Collectors.toList()))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::bindRecent, throwable -> bindRecent(Collections.emptyList())));
     }
 
     private void bindRecent(final List<StreamInfoItem> items) {
@@ -256,6 +267,182 @@ public class MainFragment extends BaseFragment {
                 .show();
     }
 
+    private void showGeminiPrompt() {
+        final String savedKey = normalizeGeminiApiKey(PreferenceManager
+                .getDefaultSharedPreferences(requireContext())
+                .getString("simple_tunes_gemini_api_key", ""));
+        if (!isGeminiApiKeyValid(savedKey)) {
+            showGeminiApiKeyDialog();
+            return;
+        }
+        final android.widget.EditText input = new android.widget.EditText(requireContext());
+        input.setHint(R.string.simple_tunes_gemini_prompt_hint);
+        input.setSingleLine(true);
+        input.setPadding(32, 8, 32, 8);
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.simple_tunes_gemini_playlist)
+                .setView(input)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    final String prompt = input.getText().toString().trim();
+                    if (!prompt.isEmpty()) {
+                        generateGeminiPlaylist(savedKey, prompt);
+                    }
+                })
+                .show();
+    }
+
+    private void showGeminiApiKeyDialog() {
+        final android.widget.EditText input = new android.widget.EditText(requireContext());
+        input.setHint(R.string.simple_tunes_gemini_api_key_hint);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setSingleLine(true);
+        input.setPadding(32, 8, 32, 8);
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.simple_tunes_gemini_api_key_title)
+                .setView(input)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    final String key = normalizeGeminiApiKey(input.getText().toString());
+                    if (key.isEmpty()) {
+                        Toast.makeText(requireContext(),
+                                R.string.simple_tunes_gemini_api_key_required,
+                                Toast.LENGTH_SHORT).show();
+                    } else if (!isGeminiApiKeyValid(key)) {
+                        Toast.makeText(requireContext(),
+                                R.string.simple_tunes_gemini_api_key_invalid,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
+                                .putString("simple_tunes_gemini_api_key", key).apply();
+                        showGeminiPrompt();
+                    }
+                })
+                .show();
+    }
+
+    private String normalizeGeminiApiKey(final String key) {
+        return key == null ? "" : key.trim().replaceAll("[\\s\"'`]", "");
+    }
+
+    private boolean isGeminiApiKeyValid(final String key) {
+        return key.matches("AIza[0-9A-Za-z_-]{20,}");
+    }
+
+    private void generateGeminiPlaylist(final String apiKey, final String prompt) {
+        if (!isGeminiApiKeyValid(apiKey)) {
+            Toast.makeText(requireContext(), R.string.simple_tunes_gemini_api_key_invalid,
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        Toast.makeText(requireContext(), R.string.simple_tunes_gemini_loading,
+                Toast.LENGTH_SHORT).show();
+        disposables.add(Observable.fromCallable(() -> requestGeminiQueries(apiKey, prompt))
+                .subscribeOn(Schedulers.io())
+                .flatMapIterable(queries -> queries)
+                .concatMapMaybe(query -> ExtractorHelper.searchFor(
+                                ServiceList.YouTube.getServiceId(), query,
+                                Collections.emptyList(), "")
+                        .subscribeOn(Schedulers.io())
+                        .map(result -> result.getRelatedItems().stream()
+                                .filter(item -> item instanceof StreamInfoItem)
+                                .map(item -> (StreamInfoItem) item)
+                                .findFirst()
+                                .orElse(null))
+                        .flatMapMaybe(item -> item == null ? Maybe.empty() : Maybe.just(item))
+                        .onErrorResumeWith(Maybe.empty()))
+                .take(10)
+                .toList()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::appendGeminiResults, this::showGeminiError));
+    }
+
+    private void showGeminiError(final Throwable throwable) {
+        String detail = throwable.getMessage();
+        if (detail == null || detail.trim().isEmpty()) {
+            detail = throwable.getClass().getSimpleName();
+        }
+        detail = detail.replace('\n', ' ');
+        if (detail.length() > 180) {
+            detail = detail.substring(0, 180) + "…";
+        }
+        Toast.makeText(requireContext(), getString(R.string.simple_tunes_gemini_error_detail,
+                detail), Toast.LENGTH_LONG).show();
+    }
+
+    private List<String> requestGeminiQueries(final String apiKey, final String prompt)
+            throws Exception {
+        final JSONObject requestJson = new JSONObject()
+                .put("contents", new JSONArray().put(new JSONObject().put("parts",
+                        new JSONArray().put(new JSONObject().put("text",
+                                "You create a YouTube music playlist. Return only a JSON array of "
+                                        + "10 concise search queries, one per song, for "
+                                        + "this request: "
+                                        + prompt)))))
+                .put("generationConfig", new JSONObject().put("temperature", 0.6));
+        String lastError = "Gemini request failed";
+        for (final String model : new String[]{"gemini-3.8-flash", "gemini-2.5-flash"}) {
+            final Request request = new Request.Builder()
+                    .url("https://generativelanguage.googleapis.com/v1beta/models/"
+                            + model + ":generateContent")
+                    .header("x-goog-api-key", apiKey)
+                    .post(RequestBody.create(requestJson.toString(), MediaType.get(
+                            "application/json; charset=utf-8")))
+                    .build();
+            try (Response response = DownloaderImpl.getInstance().getClient()
+                    .newCall(request).execute()) {
+                final String body = response.body() == null ? "" : response.body().string();
+                if (!response.isSuccessful()) {
+                    lastError = "HTTP " + response.code() + ": " + geminiErrorDetail(body);
+                    if (response.code() == 400 || response.code() == 404) {
+                        continue;
+                    }
+                    throw new IllegalStateException(lastError);
+                }
+                final JSONObject root = new JSONObject(body);
+                final String text = root.getJSONArray("candidates").getJSONObject(0)
+                        .getJSONObject("content").getJSONArray("parts").getJSONObject(0)
+                        .getString("text").replace("```json", "").replace("```", "").trim();
+                final int start = text.indexOf('[');
+                final int end = text.lastIndexOf(']');
+                if (start < 0 || end <= start) {
+                    throw new IllegalStateException("Gemini returned no query list");
+                }
+                final JSONArray queriesJson = new JSONArray(text.substring(start, end + 1));
+                final List<String> queries = new ArrayList<>();
+                for (int i = 0; i < queriesJson.length() && queries.size() < 10; i++) {
+                    final String query = queriesJson.optString(i).trim();
+                    if (!query.isEmpty()) {
+                        queries.add(query);
+                    }
+                }
+                return queries;
+            }
+        }
+        throw new IllegalStateException(lastError);
+    }
+
+    private String geminiErrorDetail(final String body) {
+        try {
+            final JSONObject error = new JSONObject(body).optJSONObject("error");
+            return error == null ? body : error.optString("message", body);
+        } catch (final Exception ignored) {
+            return body.isEmpty() ? "unknown error" : body;
+        }
+    }
+
+    private void appendGeminiResults(final List<StreamInfoItem> items) {
+        if (items.isEmpty()) {
+            Toast.makeText(requireContext(), R.string.simple_tunes_gemini_empty,
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        final List<StreamEntity> entities = items.stream().map(StreamEntity::new)
+                .collect(Collectors.toList());
+        disposables.add(PlaylistDialog.createCorrespondingDialog(requireContext(), entities,
+                dialog -> dialog.show(getParentFragmentManager(), "GeminiPlaylistDialog")));
+    }
+
     private void applyTheme(final int theme) {
         final int background;
         final int card;
@@ -290,6 +477,7 @@ public class MainFragment extends BaseFragment {
         binding.simpleRoot.setBackgroundColor(background);
         styleCard(binding.hyoSearch, card, second);
         styleCard(binding.hyoPlaylist, card, second);
+        styleCard(binding.hyoGemini, card, first);
         // The activity toolbar and status bar are outside fragment_main.xml. Keep them
         // in the same palette so the home screen does not start with an unrelated red bar.
         final View toolbar = requireActivity().findViewById(R.id.toolbar);
@@ -327,26 +515,192 @@ public class MainFragment extends BaseFragment {
                 shape, null));
     }
 
-    private void playGenre(final String genre) {
+    private void showGenrePicker() {
+        final String[] genres = {"POP", "K-POP", "HIP-HOP", "R&B", "ROCK", "LATIN", "EDM",
+                "BALLAD", "JAZZ", "INDIE", "CLASSICAL"};
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.simple_tunes_choose_genre)
+                .setItems(genres, (dialog, which) -> {
+                    dialog.dismiss();
+                    showRegionPicker(genres[which], null);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void showRegionPicker(final String genre, final MusicRecommendationEngine.Mode mode) {
+        final MusicRecommendationEngine.Region[] regions =
+                MusicRecommendationEngine.Region.values();
+        final String[] labels = Arrays.stream(regions)
+                .map(MusicRecommendationEngine.Region::getLabel)
+                .toArray(String[]::new);
+        final int selected = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getInt("simple_tunes_region", 0);
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.simple_tunes_choose_region)
+                .setSingleChoiceItems(labels, Math.min(selected, labels.length - 1),
+                        (dialog, which) -> {
+                    PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
+                            .putInt("simple_tunes_region", which).apply();
+                    dialog.dismiss();
+                    final MusicRecommendationEngine.Region region = regions[which];
+                    if (mode == null) {
+                        showModePicker(genre, region);
+                    } else {
+                        loadRecommendations(genre, region, mode);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void showModePicker(final String genre, final MusicRecommendationEngine.Region region) {
+        final MusicRecommendationEngine.Mode[] modes = MusicRecommendationEngine.Mode.values();
+        final String[] labels = Arrays.stream(modes)
+                .map(MusicRecommendationEngine.Mode::getLabel)
+                .toArray(String[]::new);
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.simple_tunes_choose_mode)
+                .setSingleChoiceItems(labels, 0, (dialog, which) -> {
+                    dialog.dismiss();
+                    loadRecommendations(genre, region, modes[which]);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void loadRecommendations(final String genre,
+                                     final MusicRecommendationEngine.Region region,
+                                     final MusicRecommendationEngine.Mode mode) {
+        final String cacheKey = MusicRecommendationEngine.cacheKey(genre, region, mode);
+        final List<StreamInfoItem> cached = MusicRecommendationEngine.readCache(requireContext(),
+                cacheKey);
+        final List<StreamInfoItem> staleCache = MusicRecommendationEngine.readCache(
+                requireContext(), cacheKey, true);
+        if (!cached.isEmpty()) {
+            showRecommendations(cached, genre, region, mode);
+            return;
+        }
         Toast.makeText(requireContext(), R.string.simple_tunes_loading, Toast.LENGTH_SHORT).show();
-        disposables.add(ExtractorHelper.searchFor(ServiceList.YouTube.getServiceId(),
-                        genre + " official audio", Collections.emptyList(), "")
-                .subscribeOn(Schedulers.io())
-                .map(result -> result.getRelatedItems().stream()
-                        .filter(item -> item instanceof StreamInfoItem)
-                        .map(item -> (StreamInfoItem) item)
+        disposables.add(Observable.fromIterable(MusicRecommendationEngine.buildQueries(
+                        genre, region, mode))
+                .concatMap(query -> ExtractorHelper.searchFor(ServiceList.YouTube.getServiceId(),
+                                query, Collections.emptyList(), "")
+                        .subscribeOn(Schedulers.io())
+                        .toObservable())
+                .flatMapIterable(result -> result.getRelatedItems())
+                .filter(item -> item instanceof StreamInfoItem)
+                .map(item -> (StreamInfoItem) item)
+                .toList()
+                .map(items -> MusicRecommendationEngine.rank(items, genre, mode))
+                .doOnSuccess(items -> MusicRecommendationEngine.writeCache(requireContext(),
+                        cacheKey, items))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(items -> {
+                    if (items.isEmpty() && staleCache.isEmpty()) {
+                        Toast.makeText(requireContext(), R.string.simple_tunes_recommend_empty,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        showRecommendations(items.isEmpty() ? staleCache : items,
+                                genre, region, mode);
+                    }
+                }, throwable -> {
+                    if (staleCache.isEmpty()) {
+                        Toast.makeText(requireContext(), R.string.simple_tunes_recommend_error,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        showRecommendations(staleCache, genre, region, mode);
+                    }
+                }));
+    }
+
+    private void showRecommendations(final List<StreamInfoItem> items, final String genre,
+                                     final MusicRecommendationEngine.Region region,
+                                     final MusicRecommendationEngine.Mode mode) {
+        final LinearLayout list = new LinearLayout(requireContext());
+        list.setOrientation(LinearLayout.VERTICAL);
+        final int padding = dp(8);
+        list.setPadding(padding, 0, padding, 0);
+        final TextView summary = new TextView(requireContext());
+        summary.setText(getString(R.string.simple_tunes_recommend_summary, items.size(),
+                genre, region.getLabel(), mode.getLabel()));
+        summary.setTextColor(Color.LTGRAY);
+        summary.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        summary.setPadding(dp(8), dp(8), dp(8), dp(8));
+        list.addView(summary);
+        for (final StreamInfoItem item : items) {
+            final LinearLayout row = new LinearLayout(requireContext());
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(dp(4), dp(5), dp(4), dp(5));
+            final ImageView thumbnail = new ImageView(requireContext());
+            thumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            thumbnail.setImageResource(R.drawable.placeholder_thumbnail_video);
+            row.addView(thumbnail, new LinearLayout.LayoutParams(dp(64), dp(64)));
+            CoilHelper.INSTANCE.loadThumbnail(thumbnail, item.getThumbnails());
+
+            final LinearLayout text = new LinearLayout(requireContext());
+            text.setOrientation(LinearLayout.VERTICAL);
+            text.setPadding(dp(8), 0, dp(6), 0);
+            final TextView title = new TextView(requireContext());
+            title.setText(item.getName());
+            title.setTextColor(Color.WHITE);
+            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            title.setMaxLines(2);
+            final TextView artist = new TextView(requireContext());
+            artist.setText(item.getUploaderName());
+            artist.setTextColor(Color.LTGRAY);
+            artist.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            artist.setMaxLines(1);
+            text.addView(title);
+            text.addView(artist);
+            row.addView(text, new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+
+            final Button play = new Button(requireContext());
+            play.setText(R.string.simple_tunes_play);
+            play.setAllCaps(false);
+            play.setOnClickListener(view -> NavigationHelper.playOnBackgroundPlayer(
+                    requireContext(), new SinglePlayQueue(item), true));
+            row.addView(play, new LinearLayout.LayoutParams(dp(64), dp(48)));
+            row.setOnClickListener(view -> NavigationHelper.playOnBackgroundPlayer(
+                    requireContext(), new SinglePlayQueue(item), true));
+            addPressAnimation(row);
+            list.addView(row, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+        final ScrollView scroll = new ScrollView(requireContext());
+        scroll.addView(list);
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.simple_tunes_recommend_title)
+                .setView(scroll)
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private int dp(final int value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
+    private void playPersonalized() {
+        if (historyRecordManager == null) {
+            historyRecordManager = new HistoryRecordManager(requireContext());
+        }
+        disposables.add(historyRecordManager.getStreamHistory()
+                .take(1)
+                .map(entries -> entries.stream()
                         .limit(10)
+                        .map(StreamHistoryEntry::toStreamInfoItem)
                         .collect(Collectors.toList()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(items -> {
                     if (items.isEmpty()) {
-                        Toast.makeText(requireContext(), R.string.simple_tunes_no_genre,
+                        Toast.makeText(requireContext(), R.string.hyo_no_history,
                                 Toast.LENGTH_LONG).show();
-                        return;
+                    } else {
+                        NavigationHelper.playOnBackgroundPlayer(requireContext(),
+                                new SinglePlayQueue(items, 0), true);
                     }
-                    NavigationHelper.playOnBackgroundPlayer(requireContext(),
-                            new SinglePlayQueue(items, 0), true);
-                }, throwable -> Toast.makeText(requireContext(), R.string.simple_tunes_genre_error,
+                }, throwable -> Toast.makeText(requireContext(), R.string.hyo_history_error,
                         Toast.LENGTH_LONG).show()));
     }
 
