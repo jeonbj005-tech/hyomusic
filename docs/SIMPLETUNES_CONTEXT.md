@@ -60,7 +60,7 @@
 ### 맞춤·AI 추천
 
 - 맞춤 추천 버튼은 `HistoryRecordManager`의 최근 기록을 최대 10곡으로 재생한다. 기록이 없으면 안내만 표시한다.
-- Gemini 버튼은 API 키와 자연어 요청을 받아 검색어 10개를 생성한 뒤 YouTube에서 첫 결과를 모아 NewPipe의 재생목록 추가 대화상자를 사용한다. API 키가 없거나 Gemini가 실패하면 오류를 표시한다.
+- Gemini 버튼은 API 키와 자연어 요청을 받아 검색어 10개를 생성한 뒤 YouTube에서 첫 결과를 모아 NewPipe의 재생목록 추가 대화상자를 사용한다. `gemini-2.5-flash`를 우선 사용하고 접근 가능한 fallback 모델을 순서대로 시도한다. API 키 입력을 다시 열 수 있고, 헤더·인증 오류가 나면 저장된 키를 지워 재입력하도록 한다.
 
 ### 추천 데이터 제약
 
@@ -81,7 +81,7 @@
 - 기존 NewPipe 업데이트 설정/WorkManager 흐름을 유지하면서 `NewVersionWorker.kt`가 GitHub raw `update.json`을 읽는다.
 - 현재 manifest와 APK 주소는 `jeonbj005-tech/hyomusic`의 `hyomusic` 브랜치를 가리킨다.
 - 버전 코드 비교 후 업데이트 알림에서 브라우저 다운로드 주소를 열며, 자동 설치는 하지 않는다.
-- 설정의 수동 업데이트 확인은 존재한다. debug/custom APK에서는 release 서명 동의 흐름이 자동으로 나타나지 않을 수 있으므로 설정에서 수동 확인해야 한다.
+- 설정의 수동 업데이트 확인은 Debug와 release APK 모두 노출된다. Debug/custom APK는 서명이 다르므로 자동 설치가 아니라 GitHub APK 다운로드 알림/브라우저 열기만 지원한다.
 
 ## 5. 스트리밍 아키텍처와 제약
 

@@ -14,6 +14,7 @@
     <string name="simple_tunes_gemini_api_key_hint">AIza… 키를 입력하세요</string>
     <string name="simple_tunes_gemini_api_key_required">먼저 Gemini API 키를 입력해 주세요.</string>
     <string name="simple_tunes_gemini_api_key_invalid">Google AI Studio API 키 형식이 올바르지 않습니다.</string>
+    <string name="simple_tunes_gemini_change_key">API 키 변경</string>
     <string name="simple_tunes_gemini_loading">Gemini가 재생목록을 만드는 중…</string>
     <string name="simple_tunes_gemini_empty">추천 곡을 찾지 못했습니다.</string>
     <string name="simple_tunes_gemini_error_detail">Gemini 오류: %1$s</string>

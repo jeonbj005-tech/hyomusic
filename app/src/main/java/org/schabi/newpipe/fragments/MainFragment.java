@@ -57,7 +57,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Maybe;
@@ -283,6 +286,8 @@ public class MainFragment extends BaseFragment {
                 .setTitle(R.string.simple_tunes_gemini_playlist)
                 .setView(input)
                 .setNegativeButton(android.R.string.cancel, null)
+                .setNeutralButton(R.string.simple_tunes_gemini_change_key,
+                        (dialog, which) -> showGeminiApiKeyDialog())
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     final String prompt = input.getText().toString().trim();
                     if (!prompt.isEmpty()) {
@@ -322,7 +327,10 @@ public class MainFragment extends BaseFragment {
     }
 
     private String normalizeGeminiApiKey(final String key) {
-        return key == null ? "" : key.trim().replaceAll("[\\s\"'`]", "");
+        final String cleaned = key == null ? "" : key.trim()
+                .replaceAll("[\\s\"'`\\u200B\\uFEFF]", "");
+        final Matcher matcher = Pattern.compile("AIza[0-9A-Za-z_-]{20,}").matcher(cleaned);
+        return matcher.find() ? matcher.group() : cleaned;
     }
 
     private boolean isGeminiApiKeyValid(final String key) {
@@ -363,6 +371,16 @@ public class MainFragment extends BaseFragment {
             detail = throwable.getClass().getSimpleName();
         }
         detail = detail.replace('\n', ' ');
+        final String lowerDetail = detail.toLowerCase(Locale.ROOT);
+        if (lowerDetail.contains("x-goog-api-key")
+                || lowerDetail.contains("http 401")
+                || lowerDetail.contains("http 403")) {
+            PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
+                    .remove("simple_tunes_gemini_api_key").apply();
+            Toast.makeText(requireContext(), R.string.simple_tunes_gemini_api_key_invalid,
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
         if (detail.length() > 180) {
             detail = detail.substring(0, 180) + "…";
         }
@@ -379,9 +397,14 @@ public class MainFragment extends BaseFragment {
                                         + "10 concise search queries, one per song, for "
                                         + "this request: "
                                         + prompt)))))
-                .put("generationConfig", new JSONObject().put("temperature", 0.6));
+                .put("generationConfig", new JSONObject()
+                        .put("temperature", 0.6)
+                        .put("responseMimeType", "application/json"));
         String lastError = "Gemini request failed";
-        for (final String model : new String[]{"gemini-3.8-flash", "gemini-2.5-flash"}) {
+        // Prefer a stable, broadly available model and retain fallbacks for accounts with
+        // different model access. Do not assume that a preview model is enabled.
+        for (final String model : new String[]{"gemini-2.5-flash", "gemini-2.5-flash-lite",
+                "gemini-3.8-flash"}) {
             final Request request = new Request.Builder()
                     .url("https://generativelanguage.googleapis.com/v1beta/models/"
                             + model + ":generateContent")

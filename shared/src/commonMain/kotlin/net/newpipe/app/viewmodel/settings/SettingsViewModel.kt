@@ -21,7 +21,8 @@ class SettingsViewModel(buildInfo: BuildInfo) : ViewModel() {
     private fun computeVisible(buildInfo: BuildInfo): List<SettingsCategoryType> =
         SettingsCategoryType.entries.filter { type ->
             when (type) {
-                SettingsCategoryType.UPDATES -> buildInfo.isReleaseApk
+                // SimpleTunes debug APKs are distributed through the same GitHub manifest.
+                SettingsCategoryType.UPDATES -> true
                 SettingsCategoryType.DEBUG -> buildInfo.isDebug
                 else -> true
             }

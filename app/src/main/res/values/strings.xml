@@ -14,6 +14,7 @@
     <string name="simple_tunes_gemini_api_key_hint">Enter your AIza… key</string>
     <string name="simple_tunes_gemini_api_key_required">Enter a Gemini API key first.</string>
     <string name="simple_tunes_gemini_api_key_invalid">Enter a valid Google AI Studio API key.</string>
+    <string name="simple_tunes_gemini_change_key">Change API key</string>
     <string name="simple_tunes_gemini_loading">Gemini is creating a playlist…</string>
     <string name="simple_tunes_gemini_empty">No recommended songs were found.</string>
     <string name="simple_tunes_gemini_error_detail">Gemini error: %1$s</string>
