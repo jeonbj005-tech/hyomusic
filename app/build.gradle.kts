@@ -39,7 +39,7 @@ configure<ApplicationExtension> {
             version = release(NEWPIPE_VERSION_SDK_TARGET)
         }
 
-        versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: 1037
+        versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: 1038
         val geminiBackendUrl = System.getProperty("geminiBackendUrl")
             ?: "https://simpletunes-gemini-5df6beotgq-du.a.run.app/v1/playlist"
         buildConfigField("String", "GEMINI_BACKEND_URL", "\"$geminiBackendUrl\"")
@@ -53,7 +53,7 @@ configure<ApplicationExtension> {
     buildTypes {
         debug {
             isDebuggable = true
-            versionNameSuffix = "-hyo.23"
+            versionNameSuffix = "-hyo.24"
 
             applicationIdSuffix = ".debug"
         }

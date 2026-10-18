@@ -171,6 +171,17 @@ public class MainActivity extends AppCompatActivity {
                 .putBoolean(getString(R.string.enable_playback_resume_key), true)
                 .apply();
 
+        // Custom SimpleTunes debug builds do not have the upstream release certificate, so the
+        // upstream consent dialog is intentionally skipped. Enable update checks once by default;
+        // changing the setting later records the user's choice.
+        if (!ReleaseVersionUtil.INSTANCE.isReleaseApk()
+                && !UpdateSettingsFragment.wasUserAskedForConsent(this)) {
+            sharedPrefEditor
+                    .putBoolean(getString(R.string.update_app_key), true)
+                    .putBoolean(getString(R.string.update_check_consent_key), true)
+                    .apply();
+        }
+
         mainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         drawerLayoutBinding = mainBinding.drawerLayout;
         drawerHeaderBinding = DrawerHeaderBinding.bind(drawerLayoutBinding.navigation
@@ -643,6 +654,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case PermissionHelper.POST_NOTIFICATIONS_REQUEST_CODE:
                 NotificationWorker.initialize(this);
+                if (sharedPreferences.getBoolean(getString(R.string.update_app_key), false)) {
+                    NewVersionWorker.enqueueNewVersionCheckingWork(this, false);
+                }
                 break;
         }
     }

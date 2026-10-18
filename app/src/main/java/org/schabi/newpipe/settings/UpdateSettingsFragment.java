@@ -16,6 +16,7 @@ public class UpdateSettingsFragment extends BasePreferenceFragment {
         final boolean checkForUpdates = (boolean) nVal;
         defaultPreferences.edit()
                 .putBoolean(getString(R.string.update_app_key), checkForUpdates)
+                .putBoolean(getString(R.string.update_check_consent_key), true)
                 .apply();
 
         if (checkForUpdates) {
