@@ -814,7 +814,7 @@
     <string name="error_insufficient_storage">기기에 저장공간이 충분하지 않습니다</string>
     <string name="show_less">덜보기</string>
     <string name="settings_category_backup_restore_title">백업 및 복원</string>
-    <string name="auto_update_check_description">NewPipe에서 자동으로 새 버전을 확인하고 업데이트가 있으면 알려줍니다.
+    <string name="auto_update_check_description">SimpleTunes에서 자동으로 새 버전을 확인하고 업데이트가 있으면 알려줍니다.
 \n이 기능을 켜시겠습니까?</string>
     <string name="reset_all_settings">모든 설정을 초기화하면 설정해둔 사항이 모두 삭제되며 앱을 다시 시작합니다.
 \n
