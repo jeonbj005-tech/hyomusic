@@ -6,15 +6,15 @@ HEAD: 배포 준비 완료 (Gemini Cloud Run 프록시 연결)
 
 ## 버전·빌드
 
-- 표시 버전: `0.29.1-hyo.22`
-- versionCode: `1036`
+- 표시 버전: `0.29.1-hyo.23`
+- versionCode: `1037`
 - applicationId: `kr.co.hyomusic.debug` (debug build; 기본 ID는 `kr.co.hyomusic`)
 - 저장소에 보관된 이전 배포 APK: `SimpleTunes-debug-v0.29.1-hyo.20.apk`
-- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.22.apk`
+- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.23.apk`
 - 이전 배포 APK SHA-256: `6278962DD332FA2CC2E1F824A4F6F7F24C4DE643B478AA221461680012269F66`
 - 이번 빌드 산출물: `app/build/outputs/apk/debug/app-debug.apk`
-- 이번 빌드 APK SHA-256: `C4E8DBF168C276682BACBD82C78604AFDABD53406329EDD5D523C4720DBA4D9F`
-- 최근 검증 명령 성공(2026-10-18): `./gradlew.bat :app:assembleDebug :app:testDebugUnitTest` (Cloud Run URL 기본값 포함)
+- 이번 빌드 APK SHA-256: `C4293DC085738A021AFB715B3ACC75CA8DB04EC74AE481EF9439088002FECCDC`
+- 최근 검증 명령 성공(2026-10-18): `./gradlew.bat :app:assembleDebug :app:testDebugUnitTest` (재생목록 버튼 큰 글자 대응 포함)
 - Checkstyle에서 발견된 100자 초과 한 줄을 수정한 뒤 재실행했으며, `assembleDebug`와 `testDebugUnitTest`가 모두 통과했다.
 
 ## 완료된 항목
@@ -31,6 +31,7 @@ HEAD: 배포 준비 완료 (Gemini Cloud Run 프록시 연결)
 - Gemini AI 재생목록 요청을 Cloud Run `/v1/playlist` 프록시로 전환하고 앱의 API 키 입력·저장·헤더 전송을 제거
 - Cloud Run 프록시는 Vertex AI Gemini를 ADC/서비스 계정으로 호출하며 `https://simpletunes-gemini-5df6beotgq-du.a.run.app`에 배포됨
 - Cloud Run `/health`와 `/v1/playlist` 실제 호출 성공(잔잔한 팝 음악 요청에서 10개 검색어 반환); APK에는 API 키를 넣지 않음
+- 큰 글자 설정에서 재생목록 버튼이 줄바꿈되지 않도록 폭·한 줄 표시를 보완함; 실기기 재검증 필요
 - 최근 기록이 없을 때 fallback 검색을 제거하고 최근 섹션을 숨김
 - 고정 Pop/Rock/Ballad/Jazz/Classical/Oldies 추천을 제거하고 중립적인 음악 탐색·맞춤·즐겨찾기·최근 재생 진입으로 변경
 - `MusicRecommendationEngine` 추가: 음악 후보 필터링, 장르 근거·공식 채널 신호·조회수·업로드 날짜 점수화, 중복 제거, 최대 20곡, 12시간 캐시 및 디버그 근거 로그
@@ -64,4 +65,4 @@ HEAD: 배포 준비 완료 (Gemini Cloud Run 프록시 연결)
 
 ## 마지막 작업
 
-2026-10-18: Gemini API 키를 APK에서 제거하고 Cloud Run/Vertex AI 프록시 호출 구조로 전환했다. Cloud Run 배포와 서버 자연어 요청을 확인하고 URL을 APK 기본 빌드 설정에 연결했다.
+2026-10-18: Gemini API 키를 APK에서 제거하고 Cloud Run/Vertex AI 프록시 호출 구조로 전환했다. Cloud Run 배포와 서버 자연어 요청을 확인하고 URL을 APK 기본 빌드 설정에 연결했다. 엄마 폰 큰 글자 설정에서 재생목록 버튼이 깨지는 문제를 수정했다.
