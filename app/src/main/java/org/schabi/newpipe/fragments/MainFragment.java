@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.text.InputType;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -32,6 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.BaseFragment;
+import org.schabi.newpipe.BuildConfig;
 import org.schabi.newpipe.DownloaderImpl;
 import org.schabi.newpipe.NewPipeDatabase;
 import org.schabi.newpipe.R;
@@ -57,10 +57,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Maybe;
@@ -271,13 +268,6 @@ public class MainFragment extends BaseFragment {
     }
 
     private void showGeminiPrompt() {
-        final String savedKey = normalizeGeminiApiKey(PreferenceManager
-                .getDefaultSharedPreferences(requireContext())
-                .getString("simple_tunes_gemini_api_key", ""));
-        if (!isGeminiApiKeyValid(savedKey)) {
-            showGeminiApiKeyDialog();
-            return;
-        }
         final android.widget.EditText input = new android.widget.EditText(requireContext());
         input.setHint(R.string.simple_tunes_gemini_prompt_hint);
         input.setSingleLine(true);
@@ -286,66 +276,19 @@ public class MainFragment extends BaseFragment {
                 .setTitle(R.string.simple_tunes_gemini_playlist)
                 .setView(input)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setNeutralButton(R.string.simple_tunes_gemini_change_key,
-                        (dialog, which) -> showGeminiApiKeyDialog())
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     final String prompt = input.getText().toString().trim();
                     if (!prompt.isEmpty()) {
-                        generateGeminiPlaylist(savedKey, prompt);
+                        generateGeminiPlaylist(prompt);
                     }
                 })
                 .show();
     }
 
-    private void showGeminiApiKeyDialog() {
-        final android.widget.EditText input = new android.widget.EditText(requireContext());
-        input.setHint(R.string.simple_tunes_gemini_api_key_hint);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        input.setSingleLine(true);
-        input.setPadding(32, 8, 32, 8);
-        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle(R.string.simple_tunes_gemini_api_key_title)
-                .setView(input)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    final String key = normalizeGeminiApiKey(input.getText().toString());
-                    if (key.isEmpty()) {
-                        Toast.makeText(requireContext(),
-                                R.string.simple_tunes_gemini_api_key_required,
-                                Toast.LENGTH_SHORT).show();
-                    } else if (!isGeminiApiKeyValid(key)) {
-                        Toast.makeText(requireContext(),
-                                R.string.simple_tunes_gemini_api_key_invalid,
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
-                                .putString("simple_tunes_gemini_api_key", key).apply();
-                        showGeminiPrompt();
-                    }
-                })
-                .show();
-    }
-
-    private String normalizeGeminiApiKey(final String key) {
-        final String cleaned = key == null ? "" : key.trim()
-                .replaceAll("[\\s\"'`\\u200B\\uFEFF]", "");
-        final Matcher matcher = Pattern.compile("AIza[0-9A-Za-z_-]{20,}").matcher(cleaned);
-        return matcher.find() ? matcher.group() : cleaned;
-    }
-
-    private boolean isGeminiApiKeyValid(final String key) {
-        return key.matches("AIza[0-9A-Za-z_-]{20,}");
-    }
-
-    private void generateGeminiPlaylist(final String apiKey, final String prompt) {
-        if (!isGeminiApiKeyValid(apiKey)) {
-            Toast.makeText(requireContext(), R.string.simple_tunes_gemini_api_key_invalid,
-                    Toast.LENGTH_LONG).show();
-            return;
-        }
+    private void generateGeminiPlaylist(final String prompt) {
         Toast.makeText(requireContext(), R.string.simple_tunes_gemini_loading,
                 Toast.LENGTH_SHORT).show();
-        disposables.add(Observable.fromCallable(() -> requestGeminiQueries(apiKey, prompt))
+        disposables.add(Observable.fromCallable(() -> requestGeminiQueries(prompt))
                 .subscribeOn(Schedulers.io())
                 .flatMapIterable(queries -> queries)
                 .concatMapMaybe(query -> ExtractorHelper.searchFor(
@@ -371,16 +314,6 @@ public class MainFragment extends BaseFragment {
             detail = throwable.getClass().getSimpleName();
         }
         detail = detail.replace('\n', ' ');
-        final String lowerDetail = detail.toLowerCase(Locale.ROOT);
-        if (lowerDetail.contains("x-goog-api-key")
-                || lowerDetail.contains("http 401")
-                || lowerDetail.contains("http 403")) {
-            PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
-                    .remove("simple_tunes_gemini_api_key").apply();
-            Toast.makeText(requireContext(), R.string.simple_tunes_gemini_api_key_invalid,
-                    Toast.LENGTH_LONG).show();
-            return;
-        }
         if (detail.length() > 180) {
             detail = detail.substring(0, 180) + "…";
         }
@@ -388,69 +321,35 @@ public class MainFragment extends BaseFragment {
                 detail), Toast.LENGTH_LONG).show();
     }
 
-    private List<String> requestGeminiQueries(final String apiKey, final String prompt)
+    private List<String> requestGeminiQueries(final String prompt)
             throws Exception {
-        final JSONObject requestJson = new JSONObject()
-                .put("contents", new JSONArray().put(new JSONObject().put("parts",
-                        new JSONArray().put(new JSONObject().put("text",
-                                "You create a YouTube music playlist. Return only a JSON array of "
-                                        + "10 concise search queries, one per song, for "
-                                        + "this request: "
-                                        + prompt)))))
-                .put("generationConfig", new JSONObject()
-                        .put("temperature", 0.6)
-                        .put("responseMimeType", "application/json"));
-        String lastError = "Gemini request failed";
-        // Prefer a stable, broadly available model and retain fallbacks for accounts with
-        // different model access. Do not assume that a preview model is enabled.
-        for (final String model : new String[]{"gemini-2.5-flash", "gemini-2.5-flash-lite",
-                "gemini-3.8-flash"}) {
-            final Request request = new Request.Builder()
-                    .url("https://generativelanguage.googleapis.com/v1beta/models/"
-                            + model + ":generateContent")
-                    .header("x-goog-api-key", apiKey)
-                    .post(RequestBody.create(requestJson.toString(), MediaType.get(
-                            "application/json; charset=utf-8")))
-                    .build();
-            try (Response response = DownloaderImpl.getInstance().getClient()
-                    .newCall(request).execute()) {
-                final String body = response.body() == null ? "" : response.body().string();
-                if (!response.isSuccessful()) {
-                    lastError = "HTTP " + response.code() + ": " + geminiErrorDetail(body);
-                    if (response.code() == 400 || response.code() == 404) {
-                        continue;
-                    }
-                    throw new IllegalStateException(lastError);
-                }
-                final JSONObject root = new JSONObject(body);
-                final String text = root.getJSONArray("candidates").getJSONObject(0)
-                        .getJSONObject("content").getJSONArray("parts").getJSONObject(0)
-                        .getString("text").replace("```json", "").replace("```", "").trim();
-                final int start = text.indexOf('[');
-                final int end = text.lastIndexOf(']');
-                if (start < 0 || end <= start) {
-                    throw new IllegalStateException("Gemini returned no query list");
-                }
-                final JSONArray queriesJson = new JSONArray(text.substring(start, end + 1));
-                final List<String> queries = new ArrayList<>();
-                for (int i = 0; i < queriesJson.length() && queries.size() < 10; i++) {
-                    final String query = queriesJson.optString(i).trim();
-                    if (!query.isEmpty()) {
-                        queries.add(query);
-                    }
-                }
-                return queries;
-            }
+        if (BuildConfig.GEMINI_BACKEND_URL.trim().isEmpty()) {
+            throw new IllegalStateException("Gemini backend is not configured");
         }
-        throw new IllegalStateException(lastError);
-    }
-
-    private String geminiErrorDetail(final String body) {
-        try {
-            final JSONObject error = new JSONObject(body).optJSONObject("error");
-            return error == null ? body : error.optString("message", body);
-        } catch (final Exception ignored) {
-            return body.isEmpty() ? "unknown error" : body;
+        final JSONObject requestJson = new JSONObject().put("prompt", prompt);
+        final Request request = new Request.Builder()
+                .url(BuildConfig.GEMINI_BACKEND_URL)
+                .post(RequestBody.create(requestJson.toString(), MediaType.get(
+                        "application/json; charset=utf-8")))
+                .build();
+        try (Response response = DownloaderImpl.getInstance().getClient()
+                .newCall(request).execute()) {
+            final String body = response.body() == null ? "" : response.body().string();
+            if (!response.isSuccessful()) {
+                throw new IllegalStateException("HTTP " + response.code());
+            }
+            final JSONArray queriesJson = new JSONObject(body).optJSONArray("queries");
+            if (queriesJson == null) {
+                throw new IllegalStateException("Gemini returned no query list");
+            }
+            final List<String> queries = new ArrayList<>();
+            for (int i = 0; i < queriesJson.length() && queries.size() < 10; i++) {
+                final String query = queriesJson.optString(i).trim();
+                if (!query.isEmpty()) {
+                    queries.add(query);
+                }
+            }
+            return queries;
         }
     }
 

@@ -39,7 +39,9 @@ configure<ApplicationExtension> {
             version = release(NEWPIPE_VERSION_SDK_TARGET)
         }
 
-        versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: 1035
+        versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: 1036
+        val geminiBackendUrl = System.getProperty("geminiBackendUrl") ?: ""
+        buildConfigField("String", "GEMINI_BACKEND_URL", "\"$geminiBackendUrl\"")
 
         versionName = NEWPIPE_VERSION_NAME
         System.getProperty("versionNameSuffix")?.let { versionNameSuffix = it }
@@ -50,7 +52,7 @@ configure<ApplicationExtension> {
     buildTypes {
         debug {
             isDebuggable = true
-            versionNameSuffix = "-hyo.21"
+            versionNameSuffix = "-hyo.22"
 
             applicationIdSuffix = ".debug"
         }
