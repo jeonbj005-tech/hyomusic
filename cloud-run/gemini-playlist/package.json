@@ -1,0 +1,16 @@
+{
+  "name": "simpletunes-gemini-playlist",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Private Cloud Run proxy for SimpleTunes Gemini playlist queries",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "google-auth-library": "^9.15.0"
+  }
+}
