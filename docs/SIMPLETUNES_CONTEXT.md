@@ -27,7 +27,7 @@
 
 - MP3/파일 다운로드, 라디오, 다른 음원 플랫폼
 - 로그인, 유료 콘텐츠, DRM·연령 제한·접근 통제 우회
-- Gemini AI 재생목록 기능은 유지한다. 앱은 자연어 요청을 개인용 Cloud Run 프록시에 보내고, 프록시는 Google Cloud 서비스 계정의 ADC로 Vertex AI Gemini를 호출해 검색어를 반환한다. Gemini 자격 증명은 APK·Git·로그에 저장하지 않으며, 프록시가 반환한 검색어를 YouTube 검색 결과와 결합해 최대 10곡의 로컬 재생목록 추가 대화상자를 연다.
+- Gemini AI 재생목록 기능은 유지한다. 앱은 자연어 요청을 개인용 Cloud Run 프록시(`https://simpletunes-gemini-5df6beotgq-du.a.run.app/v1/playlist`)에 보내고, 프록시는 Google Cloud 서비스 계정의 ADC로 Vertex AI Gemini를 호출해 검색어를 반환한다. Gemini 자격 증명은 APK·Git·로그에 저장하지 않으며, 프록시가 반환한 검색어를 YouTube 검색 결과와 결합해 최대 10곡의 로컬 재생목록 추가 대화상자를 연다.
 
 ## 3. 현재 구조(코드 확인 기준)
 

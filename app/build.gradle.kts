@@ -40,7 +40,8 @@ configure<ApplicationExtension> {
         }
 
         versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: 1036
-        val geminiBackendUrl = System.getProperty("geminiBackendUrl") ?: ""
+        val geminiBackendUrl = System.getProperty("geminiBackendUrl")
+            ?: "https://simpletunes-gemini-5df6beotgq-du.a.run.app/v1/playlist"
         buildConfigField("String", "GEMINI_BACKEND_URL", "\"$geminiBackendUrl\"")
 
         versionName = NEWPIPE_VERSION_NAME

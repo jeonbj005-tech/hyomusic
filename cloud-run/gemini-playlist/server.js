@@ -100,7 +100,7 @@ async function requestGemini(prompt) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      contents: [{parts: [{text: 'Create a YouTube music playlist. Return only a JSON array '
+      contents: [{role: 'user', parts: [{text: 'Create a YouTube music playlist. Return only a JSON array '
         + 'of 10 concise search queries, one per song, for this request: ' + prompt}]}],
       generationConfig: {temperature: 0.6, responseMimeType: 'application/json'},
     }),

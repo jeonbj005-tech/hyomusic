@@ -98,6 +98,12 @@
 - 이유: 개인 키가 APK 추출·재배포로 노출되는 것을 막고, 사용자의 Google Cloud 프로젝트와 할당량을 서버 측에서 관리하기 위해서다.
 - 영향: Cloud Run 배포 URL과 런타임 서비스 계정의 Vertex AI User 권한이 필요하다. 공개 엔드포인트는 개인 설치용이며 호출량 제한·인증을 추가하기 전에는 공개 배포를 확대하지 않는다.
 
+## D-016 — Gemini 프록시를 개인용 Cloud Run에 배포
+
+- 결정: Gemini 재생목록 요청은 `https://simpletunes-gemini-5df6beotgq-du.a.run.app/v1/playlist`로 보낸다. Cloud Run은 Vertex AI `gemini-2.5-flash`를 서비스 계정 ADC로 호출한다.
+- 이유: APK에 Gemini 키를 포함하지 않고 기존 버튼 기능을 실제로 동작시키기 위해서다.
+- 영향: 백엔드가 공개 개인용 엔드포인트이므로 비용·쿼터·남용 위험을 모니터링해야 한다. APK에는 비밀 자격 증명이 포함되지 않는다.
+
 ## D-008 — 초기 맥락 동기화 단계는 문서만 변경
 
 - 날짜: 2026-10-18
