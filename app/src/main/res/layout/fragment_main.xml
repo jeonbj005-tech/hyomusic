@@ -42,7 +42,7 @@
             <org.schabi.newpipe.views.NewPipeTextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/simple_tunes_recent_title" android:textColor="#F7F8FF" android:textSize="19sp" android:textStyle="bold" />
             <androidx.appcompat.widget.AppCompatButton android:id="@+id/recent_all" android:layout_width="wrap_content" android:layout_height="32dp" android:background="@android:color/transparent" android:minHeight="0dp" android:text="@string/simple_tunes_view_all" android:textAllCaps="false" android:textColor="#9EB8F8" android:textSize="13sp" />
         </LinearLayout>
-        <androidx.core.widget.NestedScrollView android:id="@+id/recent_scroll" android:layout_width="match_parent" android:layout_height="228dp" android:layout_marginTop="4dp" android:background="@drawable/simple_tunes_action" android:fadeScrollbars="false" android:fillViewport="false" android:nestedScrollingEnabled="true" android:overScrollMode="ifContentScrolls" android:scrollbars="vertical">
+        <androidx.core.widget.NestedScrollView android:id="@+id/recent_scroll" android:layout_width="match_parent" android:layout_height="228dp" android:layout_marginTop="4dp" android:background="@drawable/simple_tunes_action" android:fadeScrollbars="false" android:fillViewport="false" android:overScrollMode="ifContentScrolls" android:scrollbars="vertical">
             <LinearLayout android:id="@+id/recent_items" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="4dp" />
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>

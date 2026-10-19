@@ -138,3 +138,9 @@
 - 결정: 홈 최근 음악 섹션은 실제 기록 중 최대 30곡을 고정 높이 박스 안에서 스크롤하고, 각 항목은 기존처럼 썸네일·곡명·가수·재생 동작을 유지한다.
 - 이유: 바깥 홈 화면을 길게 밀지 않고도 최근 곡 여러 개를 빠르게 찾아 재생할 수 있게 한다.
 - 영향: 기록이 없는 경우 섹션을 숨긴다. 안쪽 목록과 홈 스크롤은 중첩 스크롤로 동작한다.
+
+## D-021 — 내부 NestedScrollView의 XML nestedScrollingEnabled 속성 제거
+- 날짜: 2026-10-19
+- 결정: 최근 재생 목록의 내부 `NestedScrollView`에서 `android:nestedScrollingEnabled`를 제거하고 위젯 기본값을 사용한다.
+- 이유: Android 16 / NewPipe 0.29.1-hyo.28에서 레이아웃 inflate 시 `NestedScrollView.setNestedScrollingEnabled()`가 `NestedScrollingChildHelper` 초기화 전에 호출되어 NullPointerException을 발생시켰다.
+- 영향: 최근 재생 목록은 내부 스크롤을 유지하며 홈 스크롤과 협력하는 기본 위젯 동작을 사용한다.

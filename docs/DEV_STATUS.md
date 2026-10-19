@@ -2,27 +2,27 @@
 
 기준일: 2026-10-19
 브랜치: `hyomusic`  
-HEAD: 최근 재생 목록 내부 스크롤
+HEAD: Android 16 내부 스크롤 inflate 충돌 수정
 
 ## 버전·빌드
 
-- 표시 버전: `0.29.1-hyo.28`
-- versionCode: `1042`
+- 표시 버전: `0.29.1-hyo.29`
+- versionCode: `1043`
 - applicationId: `kr.co.hyomusic.debug` (debug build; 기본 ID는 `kr.co.hyomusic`)
 - 저장소에 보관된 직전 배포 APK: `SimpleTunes-debug-v0.29.1-hyo.26.apk`
-- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.28.apk`
+- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.29.apk`
 - 직전 배포 APK SHA-256: `4526297CB03C95DD4507217C08B26CE28F554B017F74156F339BBE6FF4B75CF8`
 - 이번 빌드 산출물: `app/build/outputs/apk/debug/app-debug.apk`
-- 이번 빌드 APK SHA-256: `CB872956F52C40212418E9E10BA771C5BDEBB62A8904648BFAE06C62307311C1`
+- 이번 빌드 APK SHA-256: `F1EB2FA9202AB52F73340BD616BD29E01DF36AC3C1894F0A3C4A17CB5F883D4F`
 - 검증 명령 성공(2026-10-19): `./gradlew.bat :app:assembleDebug :app:testDebugUnitTest`
-- 최근 재생 목록의 고정 높이 내부 스크롤 변경 후 `assembleDebug`와 `testDebugUnitTest`가 모두 통과했다.
+- Android 16 `NestedScrollView` 초기화 충돌 수정 후 `assembleDebug`와 `testDebugUnitTest`가 모두 통과했다.
 
 ## 완료된 항목
 
 - 표시 이름을 SimpleTunes로 적용하고 기존 패키지/namespace 호환성을 유지
 - NewPipe 기반 YouTube 검색·추출·재생 경로 유지
 - 검색, 재생목록/북마크 진입, 중립 탐색·지역·모드 선택 기반 최대 20곡 추천 큐
-- 최근 재생 최대 30곡을 내부 스크롤 박스에 표시(썸네일·제목·업로더·재생 버튼); 실제 재생 기록이 없으면 섹션 숨김
+- 최근 재생 최대 30곡을 내부 스크롤 박스에 표시(썸네일·제목·업로더·재생 버튼); 실제 재생 기록이 없으면 섹션 숨김. Android 16 inflate 충돌 수정 완료, 실기기 확인 필요
 - 로컬 재생목록 빠른 접근 1개와 최근 통계 진입 1개
 - 짙은 남색 테마, 4개 색상 테마 대화상자, 툴바·시스템 바 색상 연동
 - 기존 foreground `PlayerService`, MediaSession/MediaBrowser, 미디어 알림 및 미니 플레이어
@@ -69,9 +69,9 @@ HEAD: 최근 재생 목록 내부 스크롤
 
 ## 마지막 작업
 
-2026-10-19: 홈의 최근 음악을 실제 기록 최대 30곡의 고정 높이 내부 스크롤 박스로 변경했다. hyo.28 debug 빌드와 단위 테스트가 통과했다. 에뮬레이터 설치는 ADB 연결 종료로 화면 검증을 하지 못했다.
+2026-10-19: hyo.28 ACRA 보고서에서 Android 16 `NestedScrollView.setNestedScrollingEnabled()` 초기화 순서 NPE를 확인했다. XML 속성을 제거해 위젯 기본 중첩 스크롤을 사용하도록 수정했다. hyo.29 debug 빌드와 단위 테스트 통과; Samsung 실기기 확인은 남아 있다.
 
 ## 이번 작업 기록
 
-- 실제 기기 검증: 미수행 (emulator-5556 APK 설치 중 ADB `closed`)
-- 다음 우선순위: Samsung 실기기에서 최근 곡 내부 스크롤과 홈 스크롤 간 동작, 글자 크기/화면 크기 대응, 미니 플레이어 겹침을 확인
+- 실제 기기 검증: 미수행. 사용자가 전달한 Samsung Android 16 ACRA 스택과 일치하는 XML 원인을 수정했으며, 재설치 후 확인 필요
+- 다음 우선순위: Samsung 실기기에 hyo.29를 설치해 홈 시작 및 최근 곡 내부/외부 스크롤을 확인
