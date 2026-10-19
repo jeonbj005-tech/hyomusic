@@ -36,6 +36,7 @@
         <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_classical" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginEnd="4dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:minHeight="0dp" android:text="♪  즐겨찾기" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="16sp" />
         <androidx.appcompat.widget.AppCompatButton android:id="@+id/hyo_oldies" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginStart="4dp" android:layout_weight="1" android:background="@drawable/simple_tunes_genre" android:minHeight="0dp" android:text="◷  최근 재생" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="16sp" />
     </LinearLayout>
+    <Space android:id="@+id/space_before_recent" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
     <LinearLayout android:id="@+id/recent_section" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="vertical" android:visibility="gone">
         <LinearLayout android:layout_width="match_parent" android:layout_height="30dp" android:gravity="center_vertical" android:orientation="horizontal">
             <org.schabi.newpipe.views.NewPipeTextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/simple_tunes_recent_title" android:textColor="#F7F8FF" android:textSize="19sp" android:textStyle="bold" />
@@ -69,6 +70,7 @@
             <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/recent_play_3" android:layout_width="36dp" android:layout_height="36dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/play" android:padding="8dp" android:src="@drawable/ic_play_arrow" app:tint="#FFFFFF" />
         </LinearLayout>
     </LinearLayout>
+    <Space android:id="@+id/space_before_playlists" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
     <LinearLayout android:id="@+id/quick_playlists_section" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="vertical">
         <LinearLayout android:layout_width="match_parent" android:layout_height="30dp" android:gravity="center_vertical" android:orientation="horizontal">
             <org.schabi.newpipe.views.NewPipeTextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/simple_tunes_frequent_playlists" android:textColor="#F7F8FF" android:textSize="19sp" android:textStyle="bold" />

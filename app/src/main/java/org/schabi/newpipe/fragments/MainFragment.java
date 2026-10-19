@@ -215,7 +215,9 @@ public class MainFragment extends BaseFragment {
         final org.schabi.newpipe.player.playqueue.PlayQueueItem currentItem =
                 PlayerHolder.getInstance().getCurrentItem();
         final boolean playerIsPlaying = PlayerHolder.getInstance().isPlaying();
-        binding.recentSection.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
+        final boolean hasRecentItems = !items.isEmpty();
+        binding.recentSection.setVisibility(hasRecentItems ? View.VISIBLE : View.GONE);
+        binding.spaceBeforeRecent.setVisibility(hasRecentItems ? View.VISIBLE : View.GONE);
         for (int i = 0; i < cards.length; i++) {
             if (i >= items.size()) {
                 cards[i].setVisibility(View.GONE);
