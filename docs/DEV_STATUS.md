@@ -1,20 +1,20 @@
 # SimpleTunes 개발 현황
 
-기준일: 2026-10-18  
+기준일: 2026-10-19
 브랜치: `hyomusic`  
-HEAD: 배포 준비 완료 (Gemini Cloud Run 프록시 연결)
+HEAD: Android Auto 최근 미디어 복원 지원
 
 ## 버전·빌드
 
-- 표시 버전: `0.29.1-hyo.24`
-- versionCode: `1038`
+- 표시 버전: `0.29.1-hyo.25`
+- versionCode: `1039`
 - applicationId: `kr.co.hyomusic.debug` (debug build; 기본 ID는 `kr.co.hyomusic`)
-- 저장소에 보관된 이전 배포 APK: `SimpleTunes-debug-v0.29.1-hyo.20.apk`
-- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.24.apk`
-- 이전 배포 APK SHA-256: `6278962DD332FA2CC2E1F824A4F6F7F24C4DE643B478AA221461680012269F66`
+- 저장소에 보관된 이전 배포 APK: `SimpleTunes-debug-v0.29.1-hyo.24.apk`
+- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.25.apk`
+- 이전 배포 APK SHA-256: `8DF8D5A0F1F5F4B16C4ED7BD93D152A9D39F69D55E80FF2F294720800D951B6B`
 - 이번 빌드 산출물: `app/build/outputs/apk/debug/app-debug.apk`
-- 이번 빌드 APK SHA-256: `8DF8D5A0F1F5F4B16C4ED7BD93D152A9D39F69D55E80FF2F294720800D951B6B`
-- 최근 검증 명령 성공(2026-10-18): `./gradlew.bat :app:assembleDebug :app:testDebugUnitTest` (자동 업데이트 기본 활성화 포함)
+- 이번 빌드 APK SHA-256: `640801142B35B3335040DCD59BCC0AB4C94C41221E855E28B31347157BEE05A5`
+- 최근 검증 명령 성공(2026-10-19): `./gradlew.bat :app:assembleDebug :app:testDebugUnitTest`
 - Checkstyle에서 발견된 100자 초과 한 줄을 수정한 뒤 재실행했으며, `assembleDebug`와 `testDebugUnitTest`가 모두 통과했다.
 
 ## 완료된 항목
@@ -36,6 +36,7 @@ HEAD: 배포 준비 완료 (Gemini Cloud Run 프록시 연결)
 - 최근 기록이 없을 때 fallback 검색을 제거하고 최근 섹션을 숨김
 - 고정 Pop/Rock/Ballad/Jazz/Classical/Oldies 추천을 제거하고 중립적인 음악 탐색·맞춤·즐겨찾기·최근 재생 진입으로 변경
 - `MusicRecommendationEngine` 추가: 음악 후보 필터링, 장르 근거·공식 채널 신호·조회수·업로드 날짜 점수화, 중복 제거, 최대 20곡, 12시간 캐시 및 디버그 근거 로그
+- Android Auto/SystemUI의 최근 재생 복원 요청에 실제 재생 기록 루트를 반환하도록 변경
 
 ## 부분 완료 / 검증 필요
 
@@ -45,7 +46,7 @@ HEAD: 배포 준비 완료 (Gemini Cloud Run 프록시 연결)
 - **즐겨찾기 의미**: 별도 favorites 모델이 아니라 NewPipe 북마크/로컬 재생목록을 사용한다. UI 명칭과 실제 이동 경로를 정리해야 한다.
 - **연속재생·이어듣기**: 기존 플레이어/재생 큐에는 지원 기반이 있으나 현재 SimpleTunes 홈의 전용 버튼 구현 여부는 확정하지 않았다.
 - **업데이트**: GitHub manifest 확인과 브라우저 다운로드 링크는 Debug/release 설정 화면에 노출되며, 실기기 알림 확인은 아직 필요하다. APK 자동 설치는 하지 않는다.
-- **차량·백그라운드**: 코드상 MediaSession, foreground service, Bluetooth 콜백이 있으나 화면 OFF, 앱 백그라운드, 전화 수신, 차량 해제/재연결, 네트워크·모바일 데이터 전환, 핸들 버튼은 실제 기기 검증 전이다.
+- **차량·백그라운드**: Android Auto 최근 재생 복원 경로와 기존 Bluetooth 오디오 콜백이 코드에 있으나 화면 OFF, 앱 백그라운드, 전화 수신, 차량 시동 후 Android Auto 앱 선택, 연결/해제, 네트워크·모바일 데이터 전환, 핸들 버튼은 실제 기기 검증 전이다.
 - **화면 대응**: 홈은 `NestedScrollView`이지만 다양한 화면 크기·큰 글꼴·미니 플레이어 겹침을 실기기에서 확인하지 않았다.
 - **Gemini**: 개인용 Cloud Run 공개 엔드포인트에 의존하며 사용량 제한·비용 관리가 필요하다. Vertex AI 자연어 요청은 서버에서 확인했지만 실기기 호출은 아직 검증하지 않았다.
 
@@ -60,10 +61,10 @@ HEAD: 배포 준비 완료 (Gemini Cloud Run 프록시 연결)
 
 ## 다음 우선순위
 
-1. 발라드·힙합·팝·라틴의 실제 검색 결과를 실기기에서 확인하고 채택/제외 로그 품질을 점검한다.
-2. Gemini 자연어 요청을 실기기에서 테스트하고 Cloud Run 사용량·비용을 모니터링한다.
-3. 작은 화면·큰 글꼴·미니 플레이어 고정 상태와 Bluetooth 차량·화면 OFF·전화 수신·데이터 전환을 검증한다.
+1. 실제 차량 Android Auto에서 시동 후 SimpleTunes 복원과 핸들 미디어 버튼을 확인한다.
+2. Bluetooth 해제/재연결, 화면 OFF, 전화 수신, 모바일 데이터 전환을 실기기에서 검증한다.
+3. 발라드·힙합·팝·라틴 추천 결과와 Gemini 자연어 요청을 실기기에서 확인한다.
 
 ## 마지막 작업
 
-2026-10-18: Gemini API 키를 APK에서 제거하고 Cloud Run/Vertex AI 프록시 호출 구조로 전환했다. Cloud Run 배포와 서버 자연어 요청을 확인하고 URL을 APK 기본 빌드 설정에 연결했다. 엄마 폰 큰 글자 설정과 Debug 자동 업데이트 검사 문제를 수정했다.
+2026-10-19: Android Auto/SystemUI의 `EXTRA_RECENT` 미디어 복원 요청이 기존 재생 기록을 반환하도록 수정했다. debug APK hyo.25 빌드와 단위 테스트가 통과했다. 차량 실기기 검증은 남아 있다.

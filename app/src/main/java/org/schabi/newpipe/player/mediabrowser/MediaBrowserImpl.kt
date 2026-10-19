@@ -83,9 +83,8 @@ class MediaBrowserImpl(
         }
 
         if (rootHints?.getBoolean(EXTRA_RECENT, false) == true) {
-            // the system is asking for a root to do media resumption, but we can't handle that yet,
-            // see https://developer.android.com/media/implement/surfaces/mobile#mediabrowserservice_implementation
-            return null
+            // Android Auto and SystemUI use this root when restoring the last media app.
+            return MediaBrowserServiceCompat.BrowserRoot(ID_HISTORY, Bundle())
         }
 
         val extras = Bundle()

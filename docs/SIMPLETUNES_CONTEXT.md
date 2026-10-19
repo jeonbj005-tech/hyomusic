@@ -71,6 +71,7 @@
 ### 재생·백그라운드·차량 — 코드 지원, 실기기 검증 필요
 
 - `PlayerService`가 foreground media playback service로 실행되고 `MediaSessionCompat`, MediaBrowser, MediaSessionConnector를 사용한다.
+- Android Auto/SystemUI의 `EXTRA_RECENT` 복원 요청은 실제 재생 기록 루트(`ID_HISTORY`)를 반환하며, 기록 항목은 기존 MediaBrowser 큐 생성 경로로 재생할 수 있다.
 - `Player`/`AudioReactor`가 오디오 포커스와 `AUDIO_BECOMING_NOISY`를 처리한다.
 - Bluetooth A2DP 장치 콜백과 재연결 시 resume 시도 코드가 있으며, `MEDIA_BUTTON` receiver/service와 AVRCP용 media session navigator가 선언되어 있다.
 - Manifest에는 INTERNET, WAKE_LOCK, 네트워크 상태, foreground media playback, 알림 권한이 있다.
