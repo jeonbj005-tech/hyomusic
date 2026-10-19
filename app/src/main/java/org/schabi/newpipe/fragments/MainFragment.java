@@ -208,6 +208,7 @@ public class MainFragment extends BaseFragment {
         final boolean hasRecentItems = !items.isEmpty();
         binding.recentSection.setVisibility(hasRecentItems ? View.VISIBLE : View.GONE);
         binding.spaceBeforeRecent.setVisibility(hasRecentItems ? View.VISIBLE : View.GONE);
+        binding.spaceBeforePlaylists.setVisibility(hasRecentItems ? View.VISIBLE : View.GONE);
         binding.recentItems.removeAllViews();
         for (final StreamInfoItem item : items) {
             final boolean isPlaying = playerIsPlaying && currentItem != null

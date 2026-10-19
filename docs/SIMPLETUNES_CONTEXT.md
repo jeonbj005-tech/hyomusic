@@ -53,6 +53,7 @@
 ### 기록·재생목록 — 부분 구현
 
 - 최근 음악은 `HistoryRecordManager.getStreamHistory()`에서 최대 30개를 읽어 내부 스크롤 박스에 썸네일·제목·업로더·재생 버튼으로 표시한다. 내부 `NestedScrollView`에는 `nestedScrollingEnabled`를 XML로 지정하지 않는다. Android 16에서 뷰 helper 초기화 전 setter가 호출되어 NPE를 일으킨다.
+- 최근 기록이 없으면 최근 섹션 앞뒤의 가변 여백도 함께 숨겨 자주 듣는 재생목록이 탐색 버튼 바로 아래에 배치된다.
 - 로컬 재생목록은 `LocalPlaylistManager.getPlaylists()`에서 첫 목록만 빠른 접근으로 표시한다.
 - 별도의 SimpleTunes 즐겨찾기 저장 모델은 없고 NewPipe 북마크/로컬 재생목록 구조를 사용한다. “최근”, “즐겨찾기”, “내 재생목록”의 의미를 UI에서 더 명확히 분리할 필요가 있다.
 - 현재 재생 항목에만 작은 alpha equalizer 텍스트 애니메이션이 있다. 실제 오디오 FFT/스펙트럼 분석은 아니다.

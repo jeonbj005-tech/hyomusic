@@ -144,3 +144,9 @@
 - 결정: 최근 재생 목록의 내부 `NestedScrollView`에서 `android:nestedScrollingEnabled`를 제거하고 위젯 기본값을 사용한다.
 - 이유: Android 16 / NewPipe 0.29.1-hyo.28에서 레이아웃 inflate 시 `NestedScrollView.setNestedScrollingEnabled()`가 `NestedScrollingChildHelper` 초기화 전에 호출되어 NullPointerException을 발생시켰다.
 - 영향: 최근 재생 목록은 내부 스크롤을 유지하며 홈 스크롤과 협력하는 기본 위젯 동작을 사용한다.
+
+## D-022 — 최근 기록이 없으면 가변 여백도 접기
+- 날짜: 2026-10-19
+- 결정: 최근 재생 기록이 없을 때 재생목록 앞의 가변 높이 spacer도 숨긴다.
+- 이유: 기록 없는 사용자에게 최근 섹션 대신 큰 공백이 보이지 않게 한다.
+- 영향: 최근 기록이 있을 때만 최근/재생목록 사이에 세로 여유 공간을 배분한다.

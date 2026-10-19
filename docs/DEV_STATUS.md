@@ -2,20 +2,20 @@
 
 기준일: 2026-10-19
 브랜치: `hyomusic`  
-HEAD: Android 16 내부 스크롤 inflate 충돌 수정
+HEAD: 최근 기록이 없을 때 홈 여백 접기
 
 ## 버전·빌드
 
-- 표시 버전: `0.29.1-hyo.29`
-- versionCode: `1043`
+- 표시 버전: `0.29.1-hyo.30`
+- versionCode: `1044`
 - applicationId: `kr.co.hyomusic.debug` (debug build; 기본 ID는 `kr.co.hyomusic`)
 - 저장소에 보관된 직전 배포 APK: `SimpleTunes-debug-v0.29.1-hyo.26.apk`
-- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.29.apk`
+- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.30.apk`
 - 직전 배포 APK SHA-256: `4526297CB03C95DD4507217C08B26CE28F554B017F74156F339BBE6FF4B75CF8`
 - 이번 빌드 산출물: `app/build/outputs/apk/debug/app-debug.apk`
-- 이번 빌드 APK SHA-256: `F1EB2FA9202AB52F73340BD616BD29E01DF36AC3C1894F0A3C4A17CB5F883D4F`
+- 이번 빌드 APK SHA-256: `976F91975E6A82C626783571AC49B7B833A6A4DFF34658719B5846A7B874B721`
 - 검증 명령 성공(2026-10-19): `./gradlew.bat :app:assembleDebug :app:testDebugUnitTest`
-- Android 16 `NestedScrollView` 초기화 충돌 수정 후 `assembleDebug`와 `testDebugUnitTest`가 모두 통과했다.
+- 최근 기록이 없을 때 재생목록 앞 가변 여백을 접는 수정 후 `assembleDebug`와 `testDebugUnitTest`가 모두 통과했다.
 
 ## 완료된 항목
 
@@ -69,9 +69,9 @@ HEAD: Android 16 내부 스크롤 inflate 충돌 수정
 
 ## 마지막 작업
 
-2026-10-19: hyo.28 ACRA 보고서에서 Android 16 `NestedScrollView.setNestedScrollingEnabled()` 초기화 순서 NPE를 확인했다. XML 속성을 제거해 위젯 기본 중첩 스크롤을 사용하도록 수정했다. hyo.29 debug 빌드와 단위 테스트 통과; Samsung 실기기 확인은 남아 있다.
+2026-10-19: hyo.28 ACRA 보고서에서 Android 16 `NestedScrollView.setNestedScrollingEnabled()` 초기화 순서 NPE를 확인해 hyo.29에서 XML 속성을 제거했다. 후속 화면에서 최근 기록이 없을 때 재생목록 위에 큰 공백이 남는 문제를 확인해 해당 조건에서 두 가변 spacer를 숨기도록 수정했다. hyo.30 빌드·단위 테스트 통과; Samsung 실기기 확인은 남아 있다.
 
 ## 이번 작업 기록
 
 - 실제 기기 검증: 미수행. 사용자가 전달한 Samsung Android 16 ACRA 스택과 일치하는 XML 원인을 수정했으며, 재설치 후 확인 필요
-- 다음 우선순위: Samsung 실기기에 hyo.29를 설치해 홈 시작 및 최근 곡 내부/외부 스크롤을 확인
+- 다음 우선순위: Samsung 실기기에 hyo.30 설치 후 기록 없음/있음 상태의 홈 간격과 최근 음악 내부 스크롤 확인
