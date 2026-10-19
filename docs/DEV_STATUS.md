@@ -6,15 +6,15 @@ HEAD: Android Auto 최근 미디어 복원 지원
 
 ## 버전·빌드
 
-- 표시 버전: `0.29.1-hyo.25`
-- versionCode: `1039`
+- 표시 버전: `0.29.1-hyo.26`
+- versionCode: `1040`
 - applicationId: `kr.co.hyomusic.debug` (debug build; 기본 ID는 `kr.co.hyomusic`)
 - 저장소에 보관된 이전 배포 APK: `SimpleTunes-debug-v0.29.1-hyo.24.apk`
-- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.25.apk`
+- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.26.apk`
 - 이전 배포 APK SHA-256: `8DF8D5A0F1F5F4B16C4ED7BD93D152A9D39F69D55E80FF2F294720800D951B6B`
 - 이번 빌드 산출물: `app/build/outputs/apk/debug/app-debug.apk`
-- 이번 빌드 APK SHA-256: `640801142B35B3335040DCD59BCC0AB4C94C41221E855E28B31347157BEE05A5`
-- 최근 검증 명령 성공(2026-10-19): `./gradlew.bat :app:assembleDebug :app:testDebugUnitTest`
+- 이번 빌드 APK SHA-256: `4526297CB03C95DD4507217C08B26CE28F554B017F74156F339BBE6FF4B75CF8`
+- 검증 명령 성공(2026-10-19): `./gradlew.bat :app:assembleDebug :app:testDebugUnitTest`
 - Checkstyle에서 발견된 100자 초과 한 줄을 수정한 뒤 재실행했으며, `assembleDebug`와 `testDebugUnitTest`가 모두 통과했다.
 
 ## 완료된 항목
@@ -28,6 +28,7 @@ HEAD: Android Auto 최근 미디어 복원 지원
 - 기존 foreground `PlayerService`, MediaSession/MediaBrowser, 미디어 알림 및 미니 플레이어
 - 오디오 포커스·AUDIO_BECOMING_NOISY·Bluetooth A2DP 재연결 시도 코드
 - GitHub `update.json` 기반 버전 확인과 설정의 수동 업데이트 확인
+- 홈에서 직접 실행 가능한 업데이트 확인 버튼: 최신/새 버전/오류 결과 표시, 알림 권한 없이도 다운로드 브라우저 열기 가능
 - Gemini AI 재생목록 요청을 Cloud Run `/v1/playlist` 프록시로 전환하고 앱의 API 키 입력·저장·헤더 전송을 제거
 - Cloud Run 프록시는 Vertex AI Gemini를 ADC/서비스 계정으로 호출하며 `https://simpletunes-gemini-5df6beotgq-du.a.run.app`에 배포됨
 - Cloud Run `/health`와 `/v1/playlist` 실제 호출 성공(잔잔한 팝 음악 요청에서 10개 검색어 반환); APK에는 API 키를 넣지 않음
@@ -45,7 +46,7 @@ HEAD: Android Auto 최근 미디어 복원 지원
 - **실제 장르 결과 예시**: 이번 작업에서는 네트워크/실기기 호출을 수행하지 않아 발라드·힙합·팝·라틴의 실제 20곡 결과를 검증하지 않았다.
 - **즐겨찾기 의미**: 별도 favorites 모델이 아니라 NewPipe 북마크/로컬 재생목록을 사용한다. UI 명칭과 실제 이동 경로를 정리해야 한다.
 - **연속재생·이어듣기**: 기존 플레이어/재생 큐에는 지원 기반이 있으나 현재 SimpleTunes 홈의 전용 버튼 구현 여부는 확정하지 않았다.
-- **업데이트**: GitHub manifest 확인과 브라우저 다운로드 링크는 Debug/release 설정 화면에 노출되며, 실기기 알림 확인은 아직 필요하다. APK 자동 설치는 하지 않는다.
+- **업데이트**: GitHub manifest 수동 확인 버튼은 홈과 설정에 있다. 홈 버튼은 새 버전 확인 결과와 다운로드 링크를 직접 표시한다. 자동 설치 및 실제 기기 업데이트 설치는 검증하지 않았다.
 - **차량·백그라운드**: Android Auto 최근 재생 복원 경로와 기존 Bluetooth 오디오 콜백이 코드에 있으나 화면 OFF, 앱 백그라운드, 전화 수신, 차량 시동 후 Android Auto 앱 선택, 연결/해제, 네트워크·모바일 데이터 전환, 핸들 버튼은 실제 기기 검증 전이다.
 - **화면 대응**: 홈은 `NestedScrollView`이지만 다양한 화면 크기·큰 글꼴·미니 플레이어 겹침을 실기기에서 확인하지 않았다.
 - **Gemini**: 개인용 Cloud Run 공개 엔드포인트에 의존하며 사용량 제한·비용 관리가 필요하다. Vertex AI 자연어 요청은 서버에서 확인했지만 실기기 호출은 아직 검증하지 않았다.
@@ -67,4 +68,9 @@ HEAD: Android Auto 최근 미디어 복원 지원
 
 ## 마지막 작업
 
-2026-10-19: Android Auto/SystemUI의 `EXTRA_RECENT` 미디어 복원 요청이 기존 재생 기록을 반환하도록 수정했다. debug APK hyo.25 빌드와 단위 테스트가 통과했다. 차량 실기기 검증은 남아 있다.
+2026-10-19: 홈에 수동 업데이트 확인 버튼을 추가했다. GitHub manifest 검사 결과가 알림 권한과 무관하게 화면에 보이고 새 APK 다운로드 주소를 열도록 연결했다. hyo.26 debug 빌드와 단위 테스트가 통과했다.
+
+## 이번 작업 기록
+
+- 실제 기기 검증: 미수행
+- 다음 우선순위: 업데이트 버튼을 눌러 최신/새 버전 표시와 브라우저 다운로드 흐름을 실기기에서 확인

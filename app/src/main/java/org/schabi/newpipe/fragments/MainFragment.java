@@ -7,6 +7,8 @@ package org.schabi.newpipe.fragments;
 
 import android.os.Bundle;
 import android.content.DialogInterface;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.text.SpannableString;
@@ -29,11 +31,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+import androidx.lifecycle.LiveData;
 
 import org.schabi.newpipe.BaseFragment;
 import org.schabi.newpipe.BuildConfig;
 import org.schabi.newpipe.DownloaderImpl;
 import org.schabi.newpipe.NewPipeDatabase;
+import org.schabi.newpipe.NewVersionWorker;
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.database.history.model.StreamHistoryEntry;
 import org.schabi.newpipe.database.playlist.PlaylistMetadataEntry;
@@ -110,12 +116,14 @@ public class MainFragment extends BaseFragment {
         binding.hyoOldies.setOnClickListener(view ->
                 NavigationHelper.openStatisticFragment(getFM()));
         binding.themeButton.setOnClickListener(view -> showThemePicker());
+        binding.updateButton.setOnClickListener(view -> checkForUpdates());
         addPressAnimation(binding.hyoSearch);
         addPressAnimation(binding.hyoPlaylist);
         addPressAnimation(binding.hyoGemini);
         addPressAnimation(binding.recentAll);
         addPressAnimation(binding.playlistAll);
         addPressAnimation(binding.themeButton);
+        addPressAnimation(binding.updateButton);
         addPressAnimation(binding.hyoPop);
         addPressAnimation(binding.hyoRock);
         addPressAnimation(binding.hyoBallad);
@@ -124,6 +132,52 @@ public class MainFragment extends BaseFragment {
         addPressAnimation(binding.hyoOldies);
         colorizeGenreIcons();
         loadHomeCollections();
+    }
+
+    private void checkForUpdates() {
+        Toast.makeText(requireContext(), R.string.checking_updates_toast,
+                Toast.LENGTH_SHORT).show();
+        final java.util.UUID workId = NewVersionWorker.enqueueNewVersionCheckingWork(
+                requireContext(), true);
+        final LiveData<WorkInfo> workInfo = WorkManager.getInstance(requireContext())
+                .getWorkInfoByIdLiveData(workId);
+        workInfo.observe(getViewLifecycleOwner(), info -> {
+                    if (info == null || !info.getState().isFinished()) {
+                        return;
+                    }
+                    workInfo.removeObservers(getViewLifecycleOwner());
+                    if (info.getState() != WorkInfo.State.SUCCEEDED
+                            || info.getOutputData().getBoolean(NewVersionWorker.CHECK_FAILED,
+                            false)) {
+                        Toast.makeText(requireContext(), R.string.simple_tunes_update_check_failed,
+                                Toast.LENGTH_LONG).show();
+                    } else if (info.getOutputData().getBoolean(NewVersionWorker.UPDATE_AVAILABLE,
+                            false)) {
+                        final String version = info.getOutputData().getString(
+                                NewVersionWorker.VERSION_NAME);
+                        final String apkUrl = info.getOutputData().getString(
+                                NewVersionWorker.APK_URL);
+                        final android.net.Uri downloadUri = android.net.Uri.parse(apkUrl);
+                        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                                .setMessage(getString(R.string.simple_tunes_update_available,
+                                        version))
+                                .setPositiveButton(R.string.simple_tunes_update_download,
+                                        (dialog, which) -> {
+                                    try {
+                                        startActivity(new Intent(Intent.ACTION_VIEW, downloadUri));
+                                    } catch (final ActivityNotFoundException ignored) {
+                                        Toast.makeText(requireContext(),
+                                                R.string.simple_tunes_update_check_failed,
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.cancel, null)
+                                .show();
+                    } else {
+                        Toast.makeText(requireContext(), R.string.app_update_unavailable_toast,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private void loadHomeCollections() {

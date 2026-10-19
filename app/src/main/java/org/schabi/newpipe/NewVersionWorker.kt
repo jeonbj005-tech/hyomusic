@@ -3,11 +3,9 @@ package org.schabi.newpipe
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.PendingIntentCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
@@ -42,18 +40,14 @@ class NewVersionWorker(
         versionCode: Int
     ) {
         if (BuildConfig.VERSION_CODE >= versionCode) {
-            if (inputData.getBoolean(IS_MANUAL, false)) {
-                // Show toast stating that the app is up-to-date if the update check was manual.
-                ContextCompat.getMainExecutor(applicationContext).execute {
-                    Toast.makeText(
-                        applicationContext,
-                        R.string.app_update_unavailable_toast,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
+            resultData = workDataOf(UPDATE_AVAILABLE to false)
             return
         }
+        resultData = workDataOf(
+            UPDATE_AVAILABLE to true,
+            VERSION_NAME to versionName,
+            APK_URL to (apkLocationUrl ?: "")
+        )
 
         // A pending intent to open the apk location url in the browser.
         val intent = Intent(Intent.ACTION_VIEW, apkLocationUrl?.toUri())
@@ -86,6 +80,8 @@ class NewVersionWorker(
             notificationManager.notify(2000, notificationBuilder.build())
         }
     }
+
+    private var resultData = workDataOf(CHECK_FAILED to true)
 
     @Throws(IOException::class, ReCaptchaException::class)
     private fun checkNewVersion() {
@@ -126,6 +122,12 @@ class NewVersionWorker(
             val versionName = latestVersionInfo.getString("version_name")
             val versionCode = latestVersionInfo.getInt("version_code")
             val apkLocationUrl = latestVersionInfo.getString("apk")
+            val apkUri = apkLocationUrl?.toUri()
+            if (versionName.isNullOrBlank() || apkUri?.scheme != "https" ||
+                apkUri.host != "github.com"
+            ) {
+                return
+            }
             compareAppVersionAndShowNotification(versionName, apkLocationUrl, versionCode)
         } catch (e: JsonParserException) {
             // Most likely something is wrong in data received from NEWPIPE_API_URL.
@@ -139,7 +141,7 @@ class NewVersionWorker(
     override fun doWork(): Result {
         return try {
             checkNewVersion()
-            Result.success()
+            Result.success(resultData)
         } catch (e: IOException) {
             Log.w(TAG, "Could not fetch NewPipe API: probably network problem", e)
             Result.failure()
@@ -155,6 +157,10 @@ class NewVersionWorker(
         private const val SIMPLE_TUNES_UPDATE_URL =
             "https://raw.githubusercontent.com/jeonbj005-tech/hyomusic/hyomusic/update.json"
         private const val IS_MANUAL = "isManual"
+        const val UPDATE_AVAILABLE = "updateAvailable"
+        const val VERSION_NAME = "versionName"
+        const val APK_URL = "apkUrl"
+        const val CHECK_FAILED = "checkFailed"
 
         /**
          * Start a new worker which checks if all conditions for performing a version check are met,
@@ -168,11 +174,12 @@ class NewVersionWorker(
          * We do not want to make unnecessary connections and DOS our servers.
          */
         @JvmStatic
-        fun enqueueNewVersionCheckingWork(context: Context, isManual: Boolean) {
+        fun enqueueNewVersionCheckingWork(context: Context, isManual: Boolean): java.util.UUID {
             val workRequest = OneTimeWorkRequestBuilder<NewVersionWorker>()
                 .setInputData(workDataOf(IS_MANUAL to isManual))
                 .build()
             WorkManager.getInstance(context).enqueue(workRequest)
+            return workRequest.id
         }
     }
 }

@@ -590,6 +590,9 @@
     <string name="any_network">모든 네트워크</string>
     <string name="check_for_updates">업데이트 확인</string>
     <string name="manual_update_description">새로운 버전을 수동으로 확인</string>
+    <string name="simple_tunes_update_available">새 버전 %1$s을(를) 다운로드할 수 있습니다.</string>
+    <string name="simple_tunes_update_download">다운로드</string>
+    <string name="simple_tunes_update_check_failed">업데이트를 확인하지 못했습니다. 인터넷 연결을 확인해 주세요.</string>
     <string name="autoplay_summary">자동으로 재생 시작 — %s</string>
     <string name="wifi_only">Wi-Fi에서만</string>
     <string name="never">사용하지 않음</string>
