@@ -2,27 +2,27 @@
 
 기준일: 2026-10-19
 브랜치: `hyomusic`  
-HEAD: 홈 업데이트 버튼 및 세로 여백 반응형 배분
+HEAD: 최근 재생 목록 내부 스크롤
 
 ## 버전·빌드
 
-- 표시 버전: `0.29.1-hyo.27`
-- versionCode: `1041`
+- 표시 버전: `0.29.1-hyo.28`
+- versionCode: `1042`
 - applicationId: `kr.co.hyomusic.debug` (debug build; 기본 ID는 `kr.co.hyomusic`)
 - 저장소에 보관된 직전 배포 APK: `SimpleTunes-debug-v0.29.1-hyo.26.apk`
-- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.27.apk`
+- 이번 배포 APK 이름: `SimpleTunes-debug-v0.29.1-hyo.28.apk`
 - 직전 배포 APK SHA-256: `4526297CB03C95DD4507217C08B26CE28F554B017F74156F339BBE6FF4B75CF8`
 - 이번 빌드 산출물: `app/build/outputs/apk/debug/app-debug.apk`
-- 이번 빌드 APK SHA-256: `3FCBCF2224EE4A192AFCAF13ED7D041E9B3FB29C55A19EC89AD6483FCA7D00BE`
+- 이번 빌드 APK SHA-256: `CB872956F52C40212418E9E10BA771C5BDEBB62A8904648BFAE06C62307311C1`
 - 검증 명령 성공(2026-10-19): `./gradlew.bat :app:assembleDebug :app:testDebugUnitTest`
-- Checkstyle에서 발견된 100자 초과 한 줄을 수정한 뒤 재실행했으며, `assembleDebug`와 `testDebugUnitTest`가 모두 통과했다.
+- 최근 재생 목록의 고정 높이 내부 스크롤 변경 후 `assembleDebug`와 `testDebugUnitTest`가 모두 통과했다.
 
 ## 완료된 항목
 
 - 표시 이름을 SimpleTunes로 적용하고 기존 패키지/namespace 호환성을 유지
 - NewPipe 기반 YouTube 검색·추출·재생 경로 유지
 - 검색, 재생목록/북마크 진입, 중립 탐색·지역·모드 선택 기반 최대 20곡 추천 큐
-- 최근 기록 3개 카드(썸네일·제목·업로더·재생 버튼)
+- 최근 재생 최대 30곡을 내부 스크롤 박스에 표시(썸네일·제목·업로더·재생 버튼); 실제 재생 기록이 없으면 섹션 숨김
 - 로컬 재생목록 빠른 접근 1개와 최근 통계 진입 1개
 - 짙은 남색 테마, 4개 색상 테마 대화상자, 툴바·시스템 바 색상 연동
 - 기존 foreground `PlayerService`, MediaSession/MediaBrowser, 미디어 알림 및 미니 플레이어
@@ -69,9 +69,9 @@ HEAD: 홈 업데이트 버튼 및 세로 여백 반응형 배분
 
 ## 마지막 작업
 
-2026-10-19: 홈에 수동 업데이트 확인 버튼을 추가하고, 긴 화면의 하단 빈 영역을 실제 콘텐츠 섹션 사이의 가변 간격으로 배분했다. hyo.27 debug 빌드와 단위 테스트가 통과했다. 에뮬레이터 설치는 ADB 연결 종료로 검증하지 못했다.
+2026-10-19: 홈의 최근 음악을 실제 기록 최대 30곡의 고정 높이 내부 스크롤 박스로 변경했다. hyo.28 debug 빌드와 단위 테스트가 통과했다. 에뮬레이터 설치는 ADB 연결 종료로 화면 검증을 하지 못했다.
 
 ## 이번 작업 기록
 
 - 실제 기기 검증: 미수행 (emulator-5556 APK 설치 중 ADB `closed`)
-- 다음 우선순위: Samsung 실기기에서 홈의 세로 간격, 글자 크기/화면 크기 대응, 미니 플레이어와 겹침을 확인
+- 다음 우선순위: Samsung 실기기에서 최근 곡 내부 스크롤과 홈 스크롤 간 동작, 글자 크기/화면 크기 대응, 미니 플레이어 겹침을 확인

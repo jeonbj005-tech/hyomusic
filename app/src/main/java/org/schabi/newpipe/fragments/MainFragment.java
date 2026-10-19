@@ -189,7 +189,7 @@ public class MainFragment extends BaseFragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(entries -> {
                     final List<StreamInfoItem> recent = entries.stream()
-                            .limit(3)
+                            .limit(30)
                             .map(StreamHistoryEntry::toStreamInfoItem)
                             .collect(Collectors.toList());
                     bindRecent(recent);
@@ -202,46 +202,95 @@ public class MainFragment extends BaseFragment {
     }
 
     private void bindRecent(final List<StreamInfoItem> items) {
-        final View[] cards = {binding.recentItem1, binding.recentItem2, binding.recentItem3};
-        final android.widget.ImageView[] thumbnails = {binding.recentThumbnail1,
-                binding.recentThumbnail2, binding.recentThumbnail3};
-        final org.schabi.newpipe.views.NewPipeTextView[] titles = {binding.recentTitle1,
-                binding.recentTitle2, binding.recentTitle3};
-        final org.schabi.newpipe.views.NewPipeTextView[] artists = {binding.recentArtist1,
-                binding.recentArtist2, binding.recentArtist3};
-        final org.schabi.newpipe.views.NewPipeTextView[] equalizers = {binding.recentEqualizer1,
-                binding.recentEqualizer2, binding.recentEqualizer3};
-        final View[] playButtons = {binding.recentPlay1, binding.recentPlay2, binding.recentPlay3};
         final org.schabi.newpipe.player.playqueue.PlayQueueItem currentItem =
                 PlayerHolder.getInstance().getCurrentItem();
         final boolean playerIsPlaying = PlayerHolder.getInstance().isPlaying();
         final boolean hasRecentItems = !items.isEmpty();
         binding.recentSection.setVisibility(hasRecentItems ? View.VISIBLE : View.GONE);
         binding.spaceBeforeRecent.setVisibility(hasRecentItems ? View.VISIBLE : View.GONE);
-        for (int i = 0; i < cards.length; i++) {
-            if (i >= items.size()) {
-                cards[i].setVisibility(View.GONE);
-                continue;
-            }
-            final StreamInfoItem item = items.get(i);
-            cards[i].setVisibility(View.VISIBLE);
-            titles[i].setText(item.getName());
-            artists[i].setText(item.getUploaderName());
-            CoilHelper.INSTANCE.loadThumbnail(thumbnails[i], item.getThumbnails());
+        binding.recentItems.removeAllViews();
+        for (final StreamInfoItem item : items) {
             final boolean isPlaying = playerIsPlaying && currentItem != null
                     && item.getUrl().equals(currentItem.getUrl());
-            equalizers[i].setVisibility(isPlaying ? View.VISIBLE : View.GONE);
-            equalizers[i].clearAnimation();
-            if (isPlaying) {
-                startEqualizerAnimation(equalizers[i]);
-            }
-            final View.OnClickListener play = view -> NavigationHelper.playOnBackgroundPlayer(
-                    requireContext(), new SinglePlayQueue(item), true);
-            cards[i].setOnClickListener(play);
-            playButtons[i].setOnClickListener(play);
-            addPressAnimation(cards[i]);
-            addPressAnimation(playButtons[i]);
+            binding.recentItems.addView(createRecentRow(item, isPlaying));
         }
+    }
+
+    private View createRecentRow(final StreamInfoItem item, final boolean isPlaying) {
+        final LinearLayout row = new LinearLayout(requireContext());
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(dp(6), dp(6), dp(6), dp(6));
+        final TypedValue selectable = new TypedValue();
+        if (requireContext().getTheme().resolveAttribute(
+                android.R.attr.selectableItemBackground, selectable, true)) {
+            row.setBackgroundResource(selectable.resourceId);
+        }
+
+        final ImageView thumbnail = new ImageView(requireContext());
+        thumbnail.setContentDescription(getString(R.string.simple_tunes_thumbnail));
+        thumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        thumbnail.setImageResource(R.drawable.placeholder_thumbnail_video);
+        row.addView(thumbnail, new LinearLayout.LayoutParams(dp(46), dp(46)));
+        CoilHelper.INSTANCE.loadThumbnail(thumbnail, item.getThumbnails());
+
+        final LinearLayout labels = new LinearLayout(requireContext());
+        labels.setOrientation(LinearLayout.VERTICAL);
+        final LinearLayout.LayoutParams labelsParams = new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+        labelsParams.setMarginStart(dp(8));
+        labelsParams.setMarginEnd(dp(4));
+        row.addView(labels, labelsParams);
+        final org.schabi.newpipe.views.NewPipeTextView title = new
+                org.schabi.newpipe.views.NewPipeTextView(requireContext());
+        title.setText(item.getName());
+        title.setTextColor(Color.WHITE);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        title.setMaxLines(1);
+        title.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        labels.addView(title);
+        final org.schabi.newpipe.views.NewPipeTextView artist = new
+                org.schabi.newpipe.views.NewPipeTextView(requireContext());
+        artist.setText(item.getUploaderName());
+        artist.setTextColor(Color.rgb(174, 184, 211));
+        artist.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        artist.setMaxLines(1);
+        artist.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        labels.addView(artist);
+
+        final org.schabi.newpipe.views.NewPipeTextView equalizer = new
+                org.schabi.newpipe.views.NewPipeTextView(requireContext());
+        equalizer.setText("▂▅▇");
+        equalizer.setTextColor(Color.rgb(156, 199, 255));
+        equalizer.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        equalizer.setGravity(Gravity.CENTER);
+        equalizer.setVisibility(isPlaying ? View.VISIBLE : View.GONE);
+        row.addView(equalizer, new LinearLayout.LayoutParams(dp(32),
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        if (isPlaying) {
+            startEqualizerAnimation(equalizer);
+        }
+
+        final androidx.appcompat.widget.AppCompatImageButton play =
+                new androidx.appcompat.widget.AppCompatImageButton(requireContext());
+        play.setContentDescription(getString(R.string.play));
+        play.setImageResource(R.drawable.ic_play_arrow);
+        play.setColorFilter(Color.WHITE);
+        play.setPadding(dp(8), dp(8), dp(8), dp(8));
+        row.addView(play, new LinearLayout.LayoutParams(dp(40), dp(40)));
+        final View.OnClickListener playItem = view -> NavigationHelper.playOnBackgroundPlayer(
+                requireContext(), new SinglePlayQueue(item), true);
+        row.setOnClickListener(playItem);
+        play.setOnClickListener(playItem);
+        addPressAnimation(row);
+        addPressAnimation(play);
+        final LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        if (binding.recentItems.getChildCount() > 0) {
+            rowParams.topMargin = dp(4);
+        }
+        row.setLayoutParams(rowParams);
+        return row;
     }
 
     private void startEqualizerAnimation(final View view) {
@@ -470,9 +519,7 @@ public class MainFragment extends BaseFragment {
         styleCard(binding.hyoJazz, card, Color.rgb(74, 196, 178));
         styleCard(binding.hyoClassical, card, Color.rgb(245, 187, 104));
         styleCard(binding.hyoOldies, card, Color.rgb(133, 174, 230));
-        styleCard(binding.recentItem1, card, second);
-        styleCard(binding.recentItem2, card, second);
-        styleCard(binding.recentItem3, card, second);
+        styleCard(binding.recentScroll, card, second);
         styleCard(binding.quickPlaylist1, card, first);
         styleCard(binding.quickPlaylist2, card, first);
         PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
